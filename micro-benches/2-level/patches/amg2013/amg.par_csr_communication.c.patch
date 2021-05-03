@@ -1,0 +1,31 @@
+--- a/parcsr_mv/par_csr_communication.c
++++ b/parcsr_mv/par_csr_communication.c
+@@ -598,10 +598,10 @@ hypre_BuildCSRMatrixMPIDataType(int num_nonzeros, int num_rows,
+    types[1] = MPI_INT;
+    types[2] = MPI_INT;
+ 
+-   MPI_Address(a_data, &displ[0]);
+-   MPI_Address(a_i, &displ[1]);
+-   MPI_Address(a_j, &displ[2]);
+-   MPI_Type_struct(3,block_lens,displ,types,csr_matrix_datatype);
++   MPI_Get_address(a_data, &displ[0]);
++   MPI_Get_address(a_i, &displ[1]);
++   MPI_Get_address(a_j, &displ[2]);
++   MPI_Type_create_struct(3,block_lens,displ,types,csr_matrix_datatype);
+    MPI_Type_commit(csr_matrix_datatype);
+ 
+    return ierr;
+@@ -623,10 +623,10 @@ hypre_BuildCSRJDataType(int num_nonzeros,
+    types[0] = MPI_DOUBLE;
+    types[1] = MPI_INT;
+  
+-   MPI_Address(a_data, &displs[0]);
+-   MPI_Address(a_j, &displs[1]);
++   MPI_Get_address(a_data, &displs[0]);
++   MPI_Get_address(a_j, &displs[1]);
+  
+-   MPI_Type_struct(2,block_lens,displs,types,csr_jdata_datatype);
++   MPI_Type_create_struct(2,block_lens,displs,types,csr_jdata_datatype);
+    MPI_Type_commit(csr_jdata_datatype);
+  
+    return ierr;

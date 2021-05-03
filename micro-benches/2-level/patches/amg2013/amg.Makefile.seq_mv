@@ -1,0 +1,21 @@
+diff --git a/seq_mv/Makefile b/seq_mv/Makefile
+index f7fcf15..e34f460 100644
+--- a/seq_mv/Makefile
++++ b/seq_mv/Makefile
+@@ -75,3 +75,16 @@ ${OBJS}: ${HEADERS}
+ .c.o:
+ 	${CC} -o $@ -c ${CFLAGS} $<
+ 
++
++
++# PARCOACH
++BC_OBJS = $(FILES:.c=.bc)
++
++# Rule to compile into LLVM bitcode for Parcoach
++$(BC_OBJS): %.bc: %.c
++	clang -c -emit-llvm $(CFLAGS) $(mpicc --showme:compiler) -g -o $@ $<
++
++libseq_mv.bc: $(BC_OBJS)
++	llvm-link $(BC_OBJS) -o $@
++
++parcoach-target: libseq_mv.bc

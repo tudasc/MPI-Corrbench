@@ -1,0 +1,13 @@
+# This is the official list of MPI correctness benchmark authors for copyright purposes.
+
+# Names should be added to this file as one of
+#     Organization's name
+#     Individual's name <Affiliation> <*optional:* submission email address>
+
+# Please keep the list sorted according to affiliation and first contribution.
+
+TU Darmstadt, Darmstadt, Germany
+Usman Ahmad <Scientific Computing>
+Jan-Patrick Lehr <Scientific Computing>
+Tim Jammer <Scientific Computing>
+Moritz Fischer <Scientific Computing>

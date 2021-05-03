@@ -1,0 +1,44 @@
+
+# This is pretty cruel and somewhat funky taken from the various cmake files...
+include build/CMakeFiles/kripke.dir/flags.make
+
+SOURCES=src/Kripke/Core/BaseVar.cpp \
+        src/Kripke/Core/DataStore.cpp \
+        src/Kripke/Core/DomainVar.cpp \
+        src/Kripke/Generate.cpp \
+        src/Kripke/Generate/Data.cpp \
+        src/Kripke/Generate/Decomp.cpp \
+        src/Kripke/Generate/Energy.cpp \
+        src/Kripke/Generate/Quadrature.cpp \
+        src/Kripke/Generate/Space.cpp \
+        src/Kripke/InputVariables.cpp \
+        src/Kripke/Kernel/LPlusTimes.cpp \
+        src/Kripke/Kernel/LTimes.cpp \
+        src/Kripke/Kernel/Population.cpp \
+        src/Kripke/Kernel/Scattering.cpp \
+        src/Kripke/Kernel/Source.cpp \
+        src/Kripke/Kernel/SweepSubdomain.cpp \
+        src/Kripke/ParallelComm/BlockJacobiComm.cpp \
+        src/Kripke/ParallelComm/SweepComm.cpp \
+        src/Kripke/ParallelComm.cpp \
+        src/Kripke/Core/PartitionSpace.cpp \
+        src/Kripke/Core/Set.cpp \
+        src/Kripke/SteadyStateSolver.cpp \
+        src/Kripke/SweepSolver.cpp \
+        src/Kripke/Timing.cpp
+
+#KRIPKE_SOURCES=src/Kripke.cpp
+
+BC_OBJS=$(SOURCES:.cpp=.bc)
+
+CXXFLAGS=$(CXX_FLAGS) $(CXX_INCLUDES) $(CXX_DEFINES)
+
+parcoach-target: $(BC_OBJS) #$(KRIPKE_SOURCES)
+	clang++ -c -emit-llvm $(CXXFLAGS) -o kripke.bc src/kripke.cpp
+	llvm-link  kripke.bc $(BC_OBJS) -o kripke.exe.bc
+	opt -load $(PARCOACH_ROOT)/lib/aSSA.* -parcoach -check-mpi kripke.exe.bc
+
+
+$(BC_OBJS): %.bc: %.cpp
+	clang++ $(CXXFLAGS)-c -emit-llvm -o $@ $<
+

@@ -1,0 +1,40 @@
+diff --git a/parcsr_ls/par_amg_setup.c b/parcsr_ls/par_amg_setup.c
+index f81f3ed..3389f2b 100644
+--- a/parcsr_ls/par_amg_setup.c
++++ b/parcsr_ls/par_amg_setup.c
+@@ -1026,7 +1026,7 @@ hypre_BoomerAMGSetup( void               *amg_vdata,
+ 
+ #ifdef HYPRE_NO_GLOBAL_PARTITION
+          if (my_id == (num_procs -1)) coarse_size = coarse_pnts_global[1];
+-         MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs-1, comm);
++         MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs, comm);
+ #else
+ 	 coarse_size = coarse_pnts_global[num_procs];
+ #endif
+@@ -1176,7 +1176,7 @@ hypre_BoomerAMGSetup( void               *amg_vdata,
+ #ifdef HYPRE_NO_GLOBAL_PARTITION
+           hypre_NewCommPkgCreate(P);
+           if (my_id == (num_procs -1)) coarse_size = coarse_pnts_global[1];
+-          MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs-1, comm);
++          MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs, comm);
+ #else
+           hypre_MatvecCommPkgCreate(P);
+           coarse_size = coarse_pnts_global[num_procs];
+@@ -1256,7 +1256,7 @@ hypre_BoomerAMGSetup( void               *amg_vdata,
+ #ifdef HYPRE_NO_GLOBAL_PARTITION
+           hypre_NewCommPkgCreate(P);
+           if (my_id == (num_procs -1)) coarse_size = coarse_pnts_global[1];
+-          MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs-1, comm);
++          MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs, comm);
+ #else
+           hypre_MatvecCommPkgCreate(P);
+           coarse_size = coarse_pnts_global[num_procs];
+@@ -1312,7 +1312,7 @@ hypre_BoomerAMGSetup( void               *amg_vdata,
+ #ifdef HYPRE_NO_GLOBAL_PARTITION
+          hypre_NewCommPkgCreate(P);
+          if (my_id == (num_procs -1)) coarse_size = coarse_pnts_global[1];
+-         MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs-1, comm);
++         MPI_Bcast(&coarse_size, 1, MPI_HYPRE_BIG_INT, num_procs, comm);
+ #else
+          hypre_MatvecCommPkgCreate(P);
+          coarse_size = coarse_pnts_global[num_procs];

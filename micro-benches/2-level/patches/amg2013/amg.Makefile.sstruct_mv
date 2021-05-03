@@ -1,0 +1,22 @@
+diff --git a/sstruct_mv/Makefile b/sstruct_mv/Makefile
+index 0e916c3..777a453 100644
+--- a/sstruct_mv/Makefile
++++ b/sstruct_mv/Makefile
+@@ -92,3 +92,17 @@ ${OBJS}: ${HEADERS}
+                                                                                                
+ .c.o:
+ 	${CC} -o $@ -c ${CFLAGS} $<
++
++
++
++# PARCOACH
++BC_OBJS = $(FILES:.c=.bc)
++
++# Rule to compile into LLVM bitcode for Parcoach
++$(BC_OBJS): %.bc: %.c
++	clang -c -emit-llvm $(CFLAGS) $(mpicc --showme:compiler) -g -o $@ $<
++
++libsstruct_mv.bc: $(BC_OBJS)
++	llvm-link $(BC_OBJS) -o $@
++
++parcoach-target: libsstruct_mv.bc

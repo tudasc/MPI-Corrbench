@@ -1,0 +1,14 @@
+diff --git a/sstruct_mv/sstruct_grid.c b/sstruct_mv/sstruct_grid.c
+index dfbe861..62572b1 100644
+--- a/sstruct_mv/sstruct_grid.c
++++ b/sstruct_mv/sstruct_grid.c
+@@ -501,7 +501,8 @@ hypre_SStructGridAssembleMaps( hypre_SStructGrid *grid )
+    offsets[0] = 0;
+ 
+    tmp_big_int = (HYPRE_BigInt) local_size;
+-   MPI_Allgather(&tmp_big_int, 1, MPI_HYPRE_BIG_INT, &offsets[1], 1, MPI_HYPRE_BIG_INT, comm);
++   // >>> MPI CorrBench changed: Original MPI_HYPRE_BIG_INT defined as MPI_INT
++   MPI_Allgather(&tmp_big_int, 1, MPI_CHAR, &offsets[1], 1, MPI_HYPRE_BIG_INT, comm);
+ 
+    /* GEC0902 calculate a ghost piece for each mapentry using the ghlocalsize of the grid.
+     * Gather each ghlocalsize in each of the processors in comm */    

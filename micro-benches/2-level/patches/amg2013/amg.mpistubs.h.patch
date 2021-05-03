@@ -1,0 +1,22 @@
+--- a/utilities/mpistubs.h
++++ b/utilities/mpistubs.h
+@@ -104,8 +104,8 @@ extern "C" {
+ #define MPI_Request_free    hypre_MPI_Request_free        
+ #define MPI_Type_contiguous hypre_MPI_Type_contiguous     
+ #define MPI_Type_vector     hypre_MPI_Type_vector     
+-#define MPI_Type_hvector    hypre_MPI_Type_hvector     
+-#define MPI_Type_struct     hypre_MPI_Type_struct      
++#define MPI_Type_create_hvector    hypre_MPI_Type_hvector     
++#define MPI_Type_create_struct     hypre_MPI_Type_struct      
+ #define MPI_Type_commit     hypre_MPI_Type_commit
+ #define MPI_Type_free       hypre_MPI_Type_free        
+ 
+@@ -192,7 +192,7 @@ int hypre_MPI_Reduce( void *sendbuf , void *recvbuf , int count , hypre_MPI_Data
+ int hypre_MPI_Request_free( hypre_MPI_Request *request );
+ int hypre_MPI_Type_contiguous( int count , hypre_MPI_Datatype oldtype , hypre_MPI_Datatype *newtype );
+ int hypre_MPI_Type_vector( int count , int blocklength , int stride , hypre_MPI_Datatype oldtype , hypre_MPI_Datatype *newtype );
+-int hypre_MPI_Type_hvector( int count , int blocklength , hypre_MPI_Aint stride , hypre_MPI_Datatype oldtype , hypre_MPI_Datatype *newtype );
++int hypre_MPI_Type_create_hvector( int count , int blocklength , hypre_MPI_Aint stride , hypre_MPI_Datatype oldtype , hypre_MPI_Datatype *newtype );
+ int hypre_MPI_Type_struct( int count , int *array_of_blocklengths , hypre_MPI_Aint *array_of_displacements , hypre_MPI_Datatype *array_of_types , hypre_MPI_Datatype *newtype );
+ int hypre_MPI_Type_commit( hypre_MPI_Datatype *datatype );
+ int hypre_MPI_Type_free( hypre_MPI_Datatype *datatype );

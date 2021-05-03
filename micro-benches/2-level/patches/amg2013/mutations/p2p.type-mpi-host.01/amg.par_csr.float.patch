@@ -1,0 +1,22 @@
+diff --git a/parcsr_mv/par_csr_communication.c b/parcsr_mv/par_csr_communication.c
+index 813ee5d..3753fa4 100644
+--- a/parcsr_mv/par_csr_communication.c
++++ b/parcsr_mv/par_csr_communication.c
+@@ -83,7 +83,7 @@ hypre_ParCSRCommHandleCreate ( int 	      job,
+       		ip = hypre_ParCSRCommPkgRecvProc(comm_pkg, i); 
+       		vec_start = hypre_ParCSRCommPkgRecvVecStart(comm_pkg,i);
+       		vec_len = hypre_ParCSRCommPkgRecvVecStart(comm_pkg,i+1)-vec_start;
+-      		MPI_Irecv(&d_recv_data[vec_start], vec_len, MPI_DOUBLE,
++      		MPI_Irecv(&d_recv_data[vec_start], vec_len, MPI_FLOAT,
+ 			ip, 0, comm, &requests[j++]);
+    	}
+    	for (i = 0; i < num_sends; i++)
+@@ -91,7 +91,7 @@ hypre_ParCSRCommHandleCreate ( int 	      job,
+ 	    vec_start = hypre_ParCSRCommPkgSendMapStart(comm_pkg, i);
+ 	    vec_len = hypre_ParCSRCommPkgSendMapStart(comm_pkg, i+1)-vec_start;
+       	    ip = hypre_ParCSRCommPkgSendProc(comm_pkg, i); 
+-   	    MPI_Isend(&d_send_data[vec_start], vec_len, MPI_DOUBLE,
++   	    MPI_Isend(&d_send_data[vec_start], vec_len, MPI_FLOAT,
+ 			ip, 0, comm, &requests[j++]);
+    	}
+ 	break;

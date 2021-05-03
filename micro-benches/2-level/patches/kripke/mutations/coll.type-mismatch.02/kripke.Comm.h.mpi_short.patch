@@ -1,0 +1,13 @@
+diff --git a/src/Kripke/Core/Comm.h b/src/Kripke/Core/Comm.h
+index 0efcd76..67ceb97 100644
+--- a/src/Kripke/Core/Comm.h
++++ b/src/Kripke/Core/Comm.h
+@@ -121,7 +121,7 @@ class Comm : public Kripke::Core::BaseVar {
+     RAJA_INLINE
+     long allReduceSumLong(long value) const {
+ #ifdef KRIPKE_USE_MPI
+-      MPI_Allreduce(MPI_IN_PLACE, &value, 1, MPI_LONG, MPI_SUM, m_comm);
++      MPI_Allreduce(MPI_IN_PLACE, &value, 1, MPI_SHORT, MPI_SUM, m_comm);
+ #endif
+       return value;
+     }

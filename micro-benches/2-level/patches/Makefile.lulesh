@@ -1,0 +1,57 @@
+#default build suggestion of MPI + OPENMP with gcc on Livermore machines you might have to change the compiler name
+
+SHELL = /bin/sh
+.SUFFIXES: .cc .o
+
+LULESH_EXEC = lulesh2.0
+
+MPICXX = mpicxx -DUSE_MPI=1
+CXX = $(MPICXX)
+
+SOURCES2.0 = \
+	lulesh.cc \
+	lulesh-comm.cc \
+	lulesh-viz.cc \
+	lulesh-util.cc \
+	lulesh-init.cc
+OBJECTS2.0 = $(SOURCES2.0:.cc=.o)
+TIDY_OBJECTS = $(SOURCES2.0:.cc=.ct)
+BC_OBJS = $(SOURCES2.0:.cc=.bc)
+
+#Default build suggestions with OpenMP for g++
+CXXFLAGS = -g -O3 -I. -Wall
+LDFLAGS = -g -O3 
+
+all: $(LULESH_EXEC)
+
+# Rule for MPI CHecker
+$(TIDY_OBJECTS): %.ct: %.cc lulesh.h
+	clang-tidy $< -checks='*mpi*' -- -DUSE_MPI=1 $(CXXFLAGS) $(mpicc --showme:compile)
+
+# Rule to compile into LLVM bitcode for Parcoach
+$(BC_OBJS): %.bc: %.cc lulesh.h
+	clang++ -c -emit-llvm -DUSE_MPI=1 $(CXXFLAGS) $(mpicc --showme:compiler) -g -o $@ $<
+
+parcoach-target: $(BC_OBJS)
+	llvm-link $(BC_OBJS) -o lulesh.bc
+	opt -load $(PARCOACH_ROOT)/lib/aSSA.* -parcoach -check-mpi lulesh.bc
+
+.cc.o: lulesh.h
+	@echo "Building $<"
+	$(CXX) -c $(CXXFLAGS) -o $@  $<
+
+lulesh2.0: $(OBJECTS2.0)
+	@echo "Linking"
+	$(CXX) $(OBJECTS2.0) $(LDFLAGS) -lm -o $@
+
+tidy-target: $(TIDY_OBJECTS)
+	@echo "Running Clang Tidy"
+	@echo "processed $(TIDY_OBJECTS)"
+
+clean:
+	/bin/rm -f *.o *~ $(OBJECTS) $(LULESH_EXEC)
+	/bin/rm -rf *.dSYM
+
+tar: clean
+	cd .. ; tar cvf lulesh-2.0.tar LULESH-2.0 ; mv lulesh-2.0.tar LULESH-2.0
+

@@ -1,0 +1,21 @@
+diff --git a/utilities/Makefile b/utilities/Makefile
+index 4db8c1e..0884b34 100644
+--- a/utilities/Makefile
++++ b/utilities/Makefile
+@@ -93,3 +93,16 @@ timer.o: timer.c
+ 
+ .c.o:
+ 	${CC} -o $@ -c ${CFLAGS} $<
++
++
++# PARCOACH
++BC_OBJS = $(UTILITIES_FILES:.c=.bc)
++
++# Rule to compile into LLVM bitcode for Parcoach
++$(BC_OBJS): %.bc: %.c
++	clang -c -emit-llvm $(CFLAGS) $(mpicc --showme:compiler) -g -o $@ $<
++
++libHYPRE_utilities.bc: $(BC_OBJS)
++	llvm-link $(BC_OBJS) -o $@
++
++parcoach-target: libHYPRE_utilities.bc

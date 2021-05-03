@@ -1,0 +1,20 @@
+--- a/utilities/thread_mpistubs.c
++++ b/utilities/thread_mpistubs.c
+@@ -482,7 +482,7 @@ hypre_thread_MPI_Type_hvector( int           count,
+   int I_call_mpi = unthreaded || pthread_equal(hypre_thread[0],pthread_self());
+   if (I_call_mpi)
+   {
+-    returnval=MPI_Type_hvector(count,blocklength,stride,oldtype,newtype);
++    returnval=MPI_Type_create_hvector(count,blocklength,stride,oldtype,newtype);
+   }
+   else
+   {
+@@ -503,7 +503,7 @@ hypre_thread_MPI_Type_struct( int           count,
+   int I_call_mpi = unthreaded || pthread_equal(hypre_thread[0],pthread_self());
+   if (I_call_mpi)
+   {
+-    returnval=MPI_Type_struct(count,array_of_blocklengths,array_of_displacements,
++    returnval=MPI_Type_create_struct(count,array_of_blocklengths,array_of_displacements,
+ 		    array_of_types,newtype);
+   }
+   else

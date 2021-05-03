@@ -1,0 +1,23 @@
+diff --git a/IJ_mv/Makefile b/IJ_mv/Makefile
+index f1ebf9f..cf23310 100644
+--- a/IJ_mv/Makefile
++++ b/IJ_mv/Makefile
+@@ -78,3 +78,18 @@ ${OBJS}: ${HEADERS}
+  
+ .c.o:
+ 	${CC} -o $@ -c ${CFLAGS} $<
++
++
++
++
++# PARCOACH
++BC_OBJS = $(FILES:.c=.bc)
++
++# Rule to compile into LLVM bitcode for Parcoach
++$(BC_OBJS): %.bc: %.c
++	clang -c -emit-llvm $(CFLAGS) $(mpicc --showme:compiler) -g -o $@ $<
++
++libIJ_mv.bc: $(BC_OBJS)
++	llvm-link $(BC_OBJS) -o $@
++
++parcoach-target: libIJ_mv.bc

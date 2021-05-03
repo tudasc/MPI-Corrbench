@@ -1,0 +1,14 @@
+diff --git a/lulesh.cc b/lulesh.cc
+index a141611..cc69628 100644
+--- a/lulesh.cc
++++ b/lulesh.cc
+@@ -211,7 +211,7 @@ void TimeIncrement(Domain& domain)
+       }
+ 
+ #if USE_MPI      
+-      MPI_Allreduce(&gnewdt, &newdt, 1,
++      MPI_Allreduce(&gnewdt, &newdt, 2,
+                     ((sizeof(Real_t) == 4) ? MPI_FLOAT : MPI_DOUBLE),
+                     MPI_MIN, MPI_COMM_WORLD) ;
+ #else
+

@@ -1,0 +1,33 @@
+diff --git a/test/Makefile b/test/Makefile
+index 15599e9..e44f5af 100644
+--- a/test/Makefile
++++ b/test/Makefile
+@@ -78,4 +78,27 @@ amg2013: amg2013.o
+                                                                                                                                          
+ .c.o:
+ 	${CC} -o $@ -c ${CFLAGS} $<
+-                                                               
++
++
++
++.PHONY: parcoach-target
++
++# PARCOACH
++BC_OBJS = $(FILES:.c=.bc)
++BC_LIBS = ../IJ_mv/libIJ_mv.bc \
++					../krylov/libkrylov.bc \
++					../parcsr_ls/libparcsr_ls.bc \
++					../parcsr_mv/libparcsr_mv.bc \
++					../seq_mv/libseq_mv.bc \
++					../sstruct_mv/libsstruct_mv.bc \
++					../struct_mv/libHYPRE_struct_mv.bc \
++					../utilities/libHYPRE_utilities.bc
++
++# Rule to compile into LLVM bitcode for Parcoach
++$(BC_OBJS): %.bc: %.c
++	clang -c -emit-llvm $(CFLAGS) $(mpicc --showme:compiler) -g -o $@ $<
++
++parcoach-target: $(BC_OBJS) 
++	llvm-link $(BC_OBJS) $(BC_LIBS) -o amg2013.bc
++	opt -load ${PARCOACH_ROOT}/lib/aSSA.* -parcoach -check-mpi amg2013.bc
++

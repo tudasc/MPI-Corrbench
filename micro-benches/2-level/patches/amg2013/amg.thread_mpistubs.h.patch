@@ -1,0 +1,24 @@
+--- a/utilities/thread_mpistubs.h
++++ b/utilities/thread_mpistubs.h
+@@ -50,8 +50,8 @@ extern "C" {
+ #define MPI_Comm_size      hypre_thread_MPI_Comm_size        
+ #define MPI_Comm_rank      hypre_thread_MPI_Comm_rank        
+ #define MPI_Allreduce      hypre_thread_MPI_Allreduce        
+-#define MPI_Type_hvector   hypre_thread_MPI_Type_hvector     
+-#define MPI_Type_struct    hypre_thread_MPI_Type_struct      
++#define MPI_Type_create_hvector   hypre_thread_MPI_Type_hvector     
++#define MPI_Type_create_struct    hypre_thread_MPI_Type_struct      
+ #define MPI_Type_free      hypre_thread_MPI_Type_free        
+ #define MPI_Type_commit    hypre_thread_MPI_Type_commit        
+ 
+@@ -92,8 +92,8 @@ int MPI_Allreduce( void *sendbuf , void *recvbuf , int count , MPI_Datatype data
+ int MPI_Address( void *location , MPI_Aint *address );
+ int MPI_Type_contiguous( int count , MPI_Datatype oldtype , MPI_Datatype *newtype );
+ int MPI_Type_vector( int count , int blocklength , int stride , MPI_Datatype oldtype , MPI_Datatype *newtype );
+-int MPI_Type_hvector( int count , int blocklength , MPI_Aint stride , MPI_Datatype oldtype , MPI_Datatype *newtype );
+-int MPI_Type_struct( int count , int *array_of_blocklengths , MPI_Aint *array_of_displacements , MPI_Datatype *array_of_types , MPI_Datatype *newtype );
++int MPI_Type_create_hvector( int count , int blocklength , MPI_Aint stride , MPI_Datatype oldtype , MPI_Datatype *newtype );
++int MPI_Type_creaet_struct( int count , int *array_of_blocklengths , MPI_Aint *array_of_displacements , MPI_Datatype *array_of_types , MPI_Datatype *newtype );
+ int MPI_Type_free( MPI_Datatype *datatype );
+ int MPI_Type_commit( MPI_Datatype *datatype );
+ int MPI_Request_free( MPI_Request *request );
