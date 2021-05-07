@@ -1,16 +1,17 @@
 name: run-MUST
 on: [push]
 jobs:
-  check-bats-version:
+  run-must:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
-      - run : sudo apt install -y \
+      - run : sudo apt get update && sudo apt-get install -y \
             cmake git libxml2-dev openmpi
 # install MUST
       - run: bash ./scripts/MUST/install_tool.sh
       - run: export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin
+#TODO provide a container with the installation of MUST
 # setup env or running
       - run: export MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE}
       - run: mkdir experiment
