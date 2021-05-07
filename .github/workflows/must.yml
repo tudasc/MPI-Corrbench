@@ -6,15 +6,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev 
-#libopenmpi-dev # MUST needs MPI with --enable-mpi1-compatibility
-- run : |
-        wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz && \
-        tar -xzf openmpi-4.1.1 && \
-        cd openmpi-4.1.1 && \
-        ./configure --prefix=/usr/local --enable-mpi1-compatibility && \
-        make all && \
-        sudo make install
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev
+# libopenmpi-dev # MUST needs MPI with --enable-mpi1-compatibility
+      - run : |
+          wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz && \
+          tar -xzf openmpi-4.1.1 && \
+          cd openmpi-4.1.1 && \
+          ./configure --prefix=/usr/local --enable-mpi1-compatibility && \
+          make all && \
+          sudo make install
 # install MUST
       - run: bash ./scripts/MUST/install_tool.sh
 #TODO provide a container with the installation of MUST
