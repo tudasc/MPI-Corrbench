@@ -58,7 +58,7 @@ def main():
     if (not BENCH_BASE_DIR):
         print("Error: provide MPI_CORRECTNESS_BM_DIR environment variable")
     args = parse_command_line_args()
-    SCRIPTS_DIR = args.BENCH_BASE_DIR + "/scripts"
+    SCRIPTS_DIR = BENCH_BASE_DIR + "/scripts"
     module_name = SCRIPTS_DIR + "/" + args.TOOL + "/parse-output.py"
     parser = module_from_path(module_name)
 
