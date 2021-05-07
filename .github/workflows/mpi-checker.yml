@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 # install clang-tidy
-      - run : sudo apt-get update && sudo apt-get install -y clang-tools-extra libopenmpi-dev
+      - run : sudo apt-get update && sudo apt-get install -y clang-tidy libopenmpi-dev
 # setup env or running
       - run: mkdir experiment
       - name: Run CorrBench
