@@ -1,0 +1,19 @@
+name: run-MPI-Checker
+on: [push]
+jobs:
+  run-mpi-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+# install clang-tidy
+      - run : sudo apt-get update && sudo apt-get install -y clang-tools-extra libopenmpi-dev
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MPI-Checker
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_MUST
+          path: ${GITHUB_WORKSPACE}/experiment/results_MUST.json
+
