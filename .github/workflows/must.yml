@@ -56,5 +56,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_MUST
-          path: ${GITHUB_WORKSPACE}/experiment/results_MUST.json
+          path: ${GITHUB_WORKSPACE}/experiment/MUST/results_MUST.json
 
