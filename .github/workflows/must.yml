@@ -27,7 +27,16 @@ jobs:
           make all && \
           sudo make install
 # install MUST
-      - run: |
+      - name: Cache MUST
+        id: cache-must
+        uses: actions/cache@v2
+        with:
+          path: MUST_install
+          key: ${{ runner.os }}-must-1.6.0
+      
+      - name: Build MUST
+        if: steps.cache-must.outputs.cache-hit != 'true'
+        run: |
           export PATH=$PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/bin && \
           export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
@@ -36,7 +45,8 @@ jobs:
 #TODO provide a container with the installation of MUST
 # setup env or running
       - run: mkdir experiment
-      - run: |
+      - name: Run CorrBench
+        run: |
            export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/bin && \
            export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
