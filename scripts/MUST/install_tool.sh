@@ -15,4 +15,8 @@ make install
 cd ../..
 
 # check if installation was succesful
-$INSTALL_DIR/bin/mustrun --help
+export PATH=$PATH/$INSTALL_DIR/bin
+export LIBRARY_PATH=$LIBRARY_PATH/$INSTALL_DIR/lib
+export LD_LIBRARY_PATH=$LIBRARY_PATH/$INSTALL_DIR/lib
+export CPATH=$CPATH/$INSTALL_DIR/include
+mustrun --help
