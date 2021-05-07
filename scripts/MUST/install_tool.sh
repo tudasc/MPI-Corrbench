@@ -10,7 +10,7 @@ cd MUST-v1.6
 mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR ..
-make -j install
+make install
 
 cd ../..
 
