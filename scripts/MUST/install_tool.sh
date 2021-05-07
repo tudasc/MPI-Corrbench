@@ -13,3 +13,6 @@ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR ..
 make -j install
 
 cd ../..
+
+# check if installation was succesful
+$INSTALL_DIR/bin/mustrun --help
