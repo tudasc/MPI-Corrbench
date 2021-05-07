@@ -37,6 +37,8 @@ NUMCASES=$(wc -w <<< $CASE_LIST)
 MAX_INDEX=$(( NUMCASES - 1))
 echo "Number Of Testcases: $MAX_INDEX"
 
+# setup environment for executing the tools
+export CPATH=$CPATH:$SRC_DIR/0-level/correct/include
 cd $OUT_DIR
 
 i=0
@@ -46,7 +48,8 @@ for CASE in $CASE_LIST; do
 mkdir $i
 
 cp $CASE $i/testcase.c
-
+# keep the case name for later evaluation
+echo "$CASE" > $i/case_name
 # execute the tool
 (cd $i && bash $SCRIPTS_DIR/$TOOL/execute_tool_in_CI.sh)
 
