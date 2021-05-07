@@ -45,7 +45,7 @@ for CASE in $CASE_LIST; do
 # setup workdir for the case
 mkdir $i
 
-cp CASE $i/testcase.c
+cp $CASE $i/testcase.c
 
 # execute the tool
 (cd $i && bash $SCRIPTS_DIR/$TOOL/execute_tool_in_CI.sh)
