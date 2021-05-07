@@ -6,4 +6,4 @@ TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
 mpicc -g testcase.c -lm
 
-$TIMEOUT_CMD mustrun -n 2 ./a.out
+$TIMEOUT_CMD mustrun -n 2 --oversubscribe ./a.out
