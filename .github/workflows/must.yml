@@ -6,9 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
-      - run : sudo apt-get update && sudo apt-get install -y \
-             git libxml2-dev libopenmpi-dev
-# cmake is already installed?
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev libopenmpi-dev
 # install MUST
       - run: bash ./scripts/MUST/install_tool.sh
       - run: export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin
