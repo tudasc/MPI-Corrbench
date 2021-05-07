@@ -1,0 +1,38 @@
+name: run-PARCOACH
+on: [push]
+jobs:
+  run-must:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang=9
+# install PARCOACH
+#      - name: Cache PARCOACH
+#        id: cache-parcoach
+#        uses: actions/cache@v2
+#        with:
+#          path: MUST_install
+#          key: ${{ runner.os }}-cache-parcoach-6990ff4
+      #TODO BUILD
+      - name: Build PARCOACH
+#        if: steps.cache-parcoach.outputs.cache-hit != 'true'
+        run: |
+          export PATH=$PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/bin && \
+          export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+          export CPATH=$CPATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/include && \
+          MPI_HOME=${GITHUB_WORKSPACE}/openmpi-4.1.1/install bash ./scripts/PARCOACH/install_tool.sh
+#TODO provide a container with the installation of MUST
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           export PARCOACH_ROOT=$TODO!!
+           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh PARCOACH
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_MUST
+          path: ${GITHUB_WORKSPACE}/experiment/PARCOACH/results_PARCOACH.json
+
