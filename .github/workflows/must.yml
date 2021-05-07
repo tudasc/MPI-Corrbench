@@ -29,9 +29,9 @@ jobs:
       - run: mkdir experiment
       - run: |
            export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/bin && \
-           export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
-           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
-           export CPATH=$CPATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/include && \
+           export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+           export CPATH=$CPATH:${GITHUB_WORKSPACE}/MUST_install/include:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/include && \
            MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
            bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
       - uses: actions/upload-artifact@v2
