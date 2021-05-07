@@ -63,4 +63,5 @@ python3 $SCRIPTS_DIR/Parser.py . $TOOL --outfile results_$TOOL.json
 
 echo "Gathered all results"
 ls .
+pwd 
 
