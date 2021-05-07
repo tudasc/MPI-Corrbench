@@ -12,10 +12,8 @@ jobs:
       - run: export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin
 #TODO provide a container with the installation of MUST
 # setup env or running
-      - run: export MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE}
       - run: mkdir experiment
-      - run: export MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment
-      - run: bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
+      - run: MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
       - uses: actions/upload-artifact@v2
         with:
           name: results_MUST
