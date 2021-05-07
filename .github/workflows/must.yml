@@ -6,14 +6,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev libopenmpi-dev
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev 
+      - run : printenv
+#libopenmpi-dev
+
+# MUST needs MPI with --enable-mpi1-compatibility
+- run : wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz && \
+        tar -xzf openmpi-4.1.1 && \
+        cd openmpi-4.1.1 && \
+        ./configure --prefix=/usr/local --enable-mpi1-compatibility && \
+        make all && \
+        sudo make install
 # install MUST
       - run: bash ./scripts/MUST/install_tool.sh
-      - run: export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin
 #TODO provide a container with the installation of MUST
 # setup env or running
       - run: mkdir experiment
-      - run: MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
+      - run: export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin && \
+             MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
       - uses: actions/upload-artifact@v2
         with:
           name: results_MUST
