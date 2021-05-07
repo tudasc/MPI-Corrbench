@@ -11,6 +11,7 @@ jobs:
       - run: mkdir experiment
       - name: Run CorrBench
         run: |
+           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
            bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MPI-Checker
       - uses: actions/upload-artifact@v2
         with:
