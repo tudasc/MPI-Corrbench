@@ -9,7 +9,16 @@ jobs:
       - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev
 # libopenmpi-dev
 # MUST needs MPI with --enable-mpi1-compatibility
-      - run : |
+      - name: Cache MPI Lib
+        id: cache-mpi
+        uses: actions/cache@v2
+        with:
+          path: openmpi-4.1.1
+          key: ${{ runner.os }}-openmpi-4.1.1
+      
+      - name: Build OpenMPI
+        if: steps.cache-mpi.outputs.cache-hit != 'true'
+        run : |
           wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz && \
           tar -xzf openmpi-4.1.1.tar.gz && \
           cd openmpi-4.1.1 && \
