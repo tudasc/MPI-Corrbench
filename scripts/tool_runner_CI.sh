@@ -39,7 +39,7 @@ echo "Number Of Testcases: $MAX_INDEX"
 
 # setup environment for executing the tools
 export CPATH=$CPATH:$SRC_DIR/0-level/correct/include
-cd $OUT_DIR
+cd $OUT_DIR/$TOOL
 
 i=0
 for CASE in $CASE_LIST; do
