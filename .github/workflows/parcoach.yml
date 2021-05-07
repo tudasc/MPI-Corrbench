@@ -8,6 +8,7 @@ jobs:
 # prerequisites
       - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9-dev
 # install PARCOACH
+# building parcoach is quite fast anyway
 #      - name: Cache PARCOACH
 #        id: cache-parcoach
 #        uses: actions/cache@v2
@@ -29,6 +30,6 @@ jobs:
            bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh PARCOACH
       - uses: actions/upload-artifact@v2
         with:
-          name: results_MUST
-          path: ${GITHUB_WORKSPACE}/experiment/PARCOACH/results_PARCOACH.json
+          name: results_PARCOACH
+          path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
 

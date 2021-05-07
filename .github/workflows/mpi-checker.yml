@@ -16,5 +16,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_MPI-Checker
-          path: ${GITHUB_WORKSPACE}/experiment/MPI-Checker/results_MPI-Checker.json
+          path: ${{ github.workspace }}/experiment/MPI-Checker/results_MPI-Checker.json
 
