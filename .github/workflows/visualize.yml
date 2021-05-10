@@ -1,6 +1,66 @@
 name: visualize
 on: [push]
 jobs:
+
+  run-must:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites for must
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev
+      - run : sudo pip3 install numpy pandas
+# libopenmpi-dev
+# MUST needs MPI with --enable-mpi1-compatibility
+      - name: Cache MPI Lib
+        id: cache-mpi
+        uses: actions/cache@v2
+        with:
+          path: openmpi-4.1.1
+          key: ${{ runner.os }}-openmpi-4.1.1
+      
+      - name: Build OpenMPI
+        if: steps.cache-mpi.outputs.cache-hit != 'true'
+        run : |
+          wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz && \
+          tar -xzf openmpi-4.1.1.tar.gz && \
+          cd openmpi-4.1.1 && \
+          mkdir install && \
+          ./configure --prefix=${GITHUB_WORKSPACE}/openmpi-4.1.1/install --enable-mpi1-compatibility && \
+          make all && \
+          sudo make install
+# install MUST
+      - name: Cache MUST
+        id: cache-must
+        uses: actions/cache@v2
+        with:
+          path: MUST_install
+          key: ${{ runner.os }}-must-1.6.0
+      
+      - name: Build MUST
+        if: steps.cache-must.outputs.cache-hit != 'true'
+        run: |
+          export PATH=$PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/bin && \
+          export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+          export CPATH=$CPATH:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/include && \
+          MPI_HOME=${GITHUB_WORKSPACE}/openmpi-4.1.1/install bash ./scripts/MUST/install_tool.sh
+#TODO provide a container with the installation of MUST
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/bin && \
+           export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
+           export CPATH=$CPATH:${GITHUB_WORKSPACE}/MUST_install/include:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/include && \
+           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_MUST
+          path: ${{ github.workspace }}/experiment/MUST/results_MUST.json
+
+
   run-parcoach:
     runs-on: ubuntu-latest
     steps:
@@ -33,6 +93,7 @@ jobs:
           name: results_PARCOACH
           path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
 
+
   run-mpi-checker:
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +113,7 @@ jobs:
 
 
   generate-visualization:
-    needs: [run-mpi-checker, run-parcoach]
+    needs: [run-mpi-checker, run-parcoach, run-must]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
