@@ -83,7 +83,7 @@ jobs:
        working-directory: ${{ github.workspace }}/visualization
        
      - name: run visualization script
-       run: python3 visualize.py
+       run: python3 generate_plots.py
        working-directory: ${{ github.workspace }}/visualization
          
      - uses: actions/upload-artifact@v2
