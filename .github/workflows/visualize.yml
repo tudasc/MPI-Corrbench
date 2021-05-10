@@ -52,8 +52,7 @@ jobs:
 
 
   generate-visualization:
-#    needs: [run-mpi-checker, run-parcoach]
-    needs: [run-mpi-checker]
+    needs: [run-mpi-checker, run-parcoach]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
@@ -61,15 +60,16 @@ jobs:
      - uses: actions/checkout@v2
      - run: mkdir output 
      - run : sudo pip3 install numpy pandas matplotlib
+
 #     - uses: actions/download-artifact@v2
 #       with:
 #         name: results_MUST
 #         path: ${{ github.workspace }}/output
          
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: results_PARCOACH
-#         path: ${{ github.workspace }}/output
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_PARCOACH
+         path: ${{ github.workspace }}/output
 
      - uses: actions/download-artifact@v2
        with:
