@@ -7,6 +7,9 @@ jobs:
 
   run-must:
     runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
@@ -56,7 +59,6 @@ jobs:
            export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/lib && \
            export CPATH=$CPATH:${GITHUB_WORKSPACE}/MUST_install/include:${GITHUB_WORKSPACE}/openmpi-4.1.1/install/include && \
-           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
            bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
       - uses: actions/upload-artifact@v2
         with:
@@ -66,6 +68,9 @@ jobs:
 
   run-parcoach:
     runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
     steps:
       - uses: actions/checkout@v2
 # prerequisites
@@ -89,7 +94,6 @@ jobs:
       - name: Run CorrBench
         run: |
            export PARCOACH_ROOT=${GITHUB_WORKSPACE}/parcoach
-           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
            bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh PARCOACH
       - uses: actions/upload-artifact@v2
         with:
@@ -99,6 +103,9 @@ jobs:
 
   run-mpi-checker:
     runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
     steps:
       - uses: actions/checkout@v2
 # install clang-tidy
@@ -107,7 +114,6 @@ jobs:
       - run: mkdir experiment
       - name: Run CorrBench
         run: |
-           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
            bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MPI-Checker
       - uses: actions/upload-artifact@v2
         with:
