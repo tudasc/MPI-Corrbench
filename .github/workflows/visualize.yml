@@ -1,0 +1,29 @@
+name: visualize
+on: [push]
+jobs:
+  generate-visualization:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v2
+     - run: mkdir output 
+
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_MUST
+         path: ${{ github.workspace }}/output
+         
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_PARCOACH
+         path: ${{ github.workspace }}/output
+
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_MPI-Checker
+         path: ${{ github.workspace }}/output   
+
+#TODO get data for ITAC (some dummy data as we no license to run it in the CI container)     
+    
+     - name: Display structure of downloaded files
+       run: ls -R
+       working-directory: path/to/artifact
