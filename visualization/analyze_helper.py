@@ -1,6 +1,6 @@
 import json
 
-input_fname_pattern = "[BENCH_BASE_DIR]/output/[TOOL].json"
+input_fname_pattern = "[BENCH_BASE_DIR]/output/results_[TOOL].json"
 input_fname_pattern_mini_app_performance = "[BENCH_BASE_DIR]/output/mini_app_performance_[TOOL].json"
 
 # entry: name: [TP,TN,FP,FN,TW,TN,ERR,case_id]
