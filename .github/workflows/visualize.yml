@@ -52,7 +52,8 @@ jobs:
 
 
   generate-visualization:
-    needs: [run-mpi-checker, run-parcoach]
+#    needs: [run-mpi-checker, run-parcoach]
+    needs: [run-mpi-checker]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
@@ -65,10 +66,10 @@ jobs:
 #         name: results_MUST
 #         path: ${{ github.workspace }}/output
          
-     - uses: actions/download-artifact@v2
-       with:
-         name: results_PARCOACH
-         path: ${{ github.workspace }}/output
+#     - uses: actions/download-artifact@v2
+#       with:
+#         name: results_PARCOACH
+#         path: ${{ github.workspace }}/output
 
      - uses: actions/download-artifact@v2
        with:
@@ -79,13 +80,13 @@ jobs:
     
      - name: add missing data
        run: python3 add_missing_data.py
-       working-directory: ${{ github.workspace }}/visualize
+       working-directory: ${{ github.workspace }}/visualization
        
      - name: run visualization script
        run: python3 visualize.py
-       working-directory: ${{ github.workspace }}/visualize
+       working-directory: ${{ github.workspace }}/visualization
          
      - uses: actions/upload-artifact@v2
        with:
           name: visualization_plots
-          path: ${{ github.workspace }}/visualize/*.pdf
+          path: ${{ github.workspace }}/visualization/*.pdf

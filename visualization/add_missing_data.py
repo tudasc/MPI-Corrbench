@@ -45,7 +45,6 @@ def add_missing_data(data, tools, bench_base_dir):
     find_out = subprocess.run(["find", ("%s/micro-benches/0-level" % BENCH_BASE_DIR), "-type", "f", "-name", "*.c"], stdout=subprocess.PIPE)
     testcases = find_out.stdout.decode("utf-8").split()
 
-    print (testcases)
     for i in range(0, len(testcases)):
         for tool in tools:
             if not i in data[tool]:
