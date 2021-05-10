@@ -1,5 +1,7 @@
 name: run-PARCOACH
 on: [push]
+   branches:
+    - main
 jobs:
   run-parcoach:
     runs-on: ubuntu-latest

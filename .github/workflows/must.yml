@@ -1,5 +1,7 @@
 name: run-MUST
 on: [push]
+   branches:
+    - main
 jobs:
   run-must:
     runs-on: ubuntu-latest
