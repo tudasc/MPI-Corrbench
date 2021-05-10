@@ -1,16 +1,67 @@
 name: visualize
 on: [push]
 jobs:
+  run-parcoach:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9-dev
+# install PARCOACH
+# building parcoach is quite fast anyway
+#      - name: Cache PARCOACH
+#        id: cache-parcoach
+#        uses: actions/cache@v2
+#        with:
+#          path: parcoach
+#          key: ${{ runner.os }}-cache-parcoach-master
+      #TODO BUILD
+      - name: Build PARCOACH
+#        if: steps.cache-parcoach.outputs.cache-hit != 'true'
+        run: |
+           bash ./scripts/PARCOACH/install_tool.sh
+#TODO provide a container with the installation of MUST
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           export PARCOACH_ROOT=${GITHUB_WORKSPACE}/parcoach
+           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh PARCOACH
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_PARCOACH
+          path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
+
+  run-mpi-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+# install clang-tidy
+      - run : sudo apt-get update && sudo apt-get install -y clang-tidy libopenmpi-dev
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           MPI_CORRECTNESS_BM_DIR=${GITHUB_WORKSPACE} MPI_CORRECTNESS_BM_EXPERIMENT_DIR=${GITHUB_WORKSPACE}/experiment \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MPI-Checker
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_MPI-Checker
+          path: ${{ github.workspace }}/experiment/MPI-Checker/results_MPI-Checker.json
+
+
   generate-visualization:
+    needs: [run-mpi-checker, run-parcoach]
     runs-on: ubuntu-latest
     steps:
      - uses: actions/checkout@v2
      - run: mkdir output 
 
-     - uses: actions/download-artifact@v2
-       with:
-         name: results_MUST
-         path: ${{ github.workspace }}/output
+#     - uses: actions/download-artifact@v2
+#       with:
+#         name: results_MUST
+#         path: ${{ github.workspace }}/output
          
      - uses: actions/download-artifact@v2
        with:
