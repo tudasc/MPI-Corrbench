@@ -29,7 +29,7 @@ mkdir -p $OUT_DIR
 mkdir -p $OUT_DIR/$TOOL
 
 # only the src files, exclude dirs
-CASE_LIST=$(find "$SRC_DIR/0-level" -type f -name "*.c" | head -n 10)
+CASE_LIST=$(find "$SRC_DIR/0-level" -type f -name "*.c" )
 # convert list into array
 
 NUMCASES=$(wc -w <<< $CASE_LIST)
