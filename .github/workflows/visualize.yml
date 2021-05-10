@@ -86,6 +86,6 @@ jobs:
        working-directory: ${{ github.workspace }}/visualize
          
      - uses: actions/upload-artifact@v2
-        with:
+       with:
           name: visualization_plots
           path: ${{ github.workspace }}/visualize/*.pdf
