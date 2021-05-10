@@ -47,9 +47,10 @@ def add_missing_data(data, tools, bench_base_dir):
 
     for i in range(0, len(testcases)):
         for tool in tools:
-            if not i in data[tool]:
+        # dict keys are strings (originally they are the execution directories name)
+            if not str(i) in data[tool]:
                 # need to add missing data
-                data[tool][i]=[0,0,0,0,0,0,1,str(i),testcases[i]]
+                data[tool][str(i)]=[0,0,0,0,0,0,1,str(i),testcases[i]]]
     return data
 
 def main():
