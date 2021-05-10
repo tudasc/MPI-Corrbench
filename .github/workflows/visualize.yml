@@ -54,10 +54,12 @@ jobs:
   generate-visualization:
     needs: [run-mpi-checker, run-parcoach]
     runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
     steps:
      - uses: actions/checkout@v2
      - run: mkdir output 
-
+     - run : sudo pip3 install numpy pandas matplotlib
 #     - uses: actions/download-artifact@v2
 #       with:
 #         name: results_MUST
@@ -73,8 +75,17 @@ jobs:
          name: results_MPI-Checker
          path: ${{ github.workspace }}/output   
 
-#TODO get data for ITAC (some dummy data as we no license to run it in the CI container)     
+#TODO get real data for ITAC (we need license to run it in the CI container)     
     
-     - name: Display structure of downloaded files
-       run: ls -R
-       working-directory: ${{ github.workspace }}/output
+     - name: add missing data
+       run: python3 add_missing_data.py
+       working-directory: ${{ github.workspace }}/visualize
+       
+     - name: run visualization script
+       run: python3 visualize.py
+       working-directory: ${{ github.workspace }}/visualize
+         
+     - uses: actions/upload-artifact@v2
+        with:
+          name: visualization_plots
+          path: ${{ github.workspace }}/visualize/*.pdf
