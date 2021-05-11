@@ -74,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 # prerequisites
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9-dev
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9 llvm-9-dev
 # install PARCOACH
 # building parcoach is quite fast anyway
 #      - name: Cache PARCOACH
