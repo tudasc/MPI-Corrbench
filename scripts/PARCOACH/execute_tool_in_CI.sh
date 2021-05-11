@@ -1,5 +1,8 @@
 #!/bin/bash
 
+which opt
+which opt-9
+
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
 clang -DEXCLUDE_PARCOACH_UNSUPPORTED_FUNCTIONS -c -g $(mpicc --showme:compile) -emit-llvm testcase.c -o testcase.bc
