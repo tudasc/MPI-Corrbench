@@ -169,8 +169,8 @@ jobs:
          echo "* Mpi-Checker (clang-tidy) version : $MPI_CHECKER_VERSION" > stats.md 
          echo "* PARCOACH Version : $PARCOACH_VERSION" > stats.md
          # build new readme
-         cat skeleton.md stats.md > readme.md
-         git add readme.md images/*
+         cat skeleton.md stats.md > README.md
+         git add README.md images/*
          git commit -m"Updated" 
          git push
 
