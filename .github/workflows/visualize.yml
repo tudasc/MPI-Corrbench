@@ -152,7 +152,7 @@ jobs:
 
      - name: update dashboard
        working-directory: ${{ github.workspace }}/visualization
-        run: |
+       run: |
          # Git setup
          export GITHUB_USER=corrbench-bot
          echo "GITHUB_USER=$GITHUB_USER" >> $GITHUB_ENV
@@ -169,7 +169,7 @@ jobs:
          echo "* TTAC Version : $ITAC_VERSION" > stats.md 
          echo "* Mpi-Checker (clang-tidy) version : $MPI_CHECKER_VERSION" > stats.md 
          echo "* PARCOACH Version : $PARCOACH_VERSION" > stats.md
-# build new readme
+         # build new readme
          cat skeleton.md stats.md > readme.md
          git add readme.md images/*
          git commit -m"Updated" 
