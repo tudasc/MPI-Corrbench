@@ -158,7 +158,7 @@ jobs:
          echo "GITHUB_TOKEN=${{ secrets.dashboard_update_token }}" >> $GITHUB_ENV
          git config --global user.email "corrbench-bot@users.noreply.github.com"
          git config --global user.name $GITHUB_USER
-         git clone https://$GITHUB_USER:${{ secrets.dashboard_update_token }}/tudasc/mpi-corrbench-dashboard.git --depth 1
+         git clone https://$GITHUB_USER:${{ secrets.dashboard_update_token }}@Fgithub.com/tudasc/mpi-corrbench-dashboard.gitt --depth 1
          #copy images and write the stats
          cp *.svg mpi-corrbench-dashboard/images
          cd mpi-corrbench-dashboard
