@@ -104,6 +104,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+#TODO automatically get these version numbers
+# or at least get them form the executor jobs
+      MUST_VERSION: "1.7.0"
+      ITAC_VERSION: "(No Data for itac: No Licnse to execute it in CI container)"
+      MPI_CHECKER_VERSION: "10.0"
+      PARCOACH_VERSION: "6990ff4 (master)"
     steps:
      - uses: actions/checkout@v2
      - run: mkdir output 
@@ -130,12 +136,41 @@ jobs:
        run: python3 add_missing_data.py
        working-directory: ${{ github.workspace }}/visualization
        
-     - name: run visualization script
+     - name: generate svg plots
+       run: python3 generate_plots.py --format svg
+       working-directory: ${{ github.workspace }}/visualization
+
+     - name: generate pdf plots
        run: python3 generate_plots.py
        working-directory: ${{ github.workspace }}/visualization
-         
+
      - uses: actions/upload-artifact@v2
        with:
           name: visualization_plots
           path: ${{ github.workspace }}/visualization/*.pdf
+
+     - name: update dashboard
+       working-directory: ${{ github.workspace }}/visualization
+        run: |
+         # Git setup
+         export GITHUB_USER=corrbench-bot
+         echo "GITHUB_USER=$GITHUB_USER" >> $GITHUB_ENV
+         echo "GITHUB_TOKEN=${{ secrets.dashboard_update_token }}" >> $GITHUB_ENV
+         git config --global user.email "corrbench-bot@users.noreply.github.com"
+         git config --global user.name $GITHUB_USER
+         git clone git@github.com:tudasc/mpi-corrbench-dashboard.git --depth 1
+         #copy images and write the stats
+         cp *.svg mpi-corrbench-dashboard/images
+         cd mpi-corrbench-dashboard
+         echo "* Visualization generated on $(date)" > stats.md
+         echo "* Using  [Corrbench](https://github.com/tudasc/mpi-corrbench "MPI-CorrBench") version [$(${GITHUB_SHA} | cut -c1-8)](https://github.com/tudasc/mpi-corrbench/commit/$GITHUB_SHA)" >> stats.md
+         echo "* Must Version : $MUST_VERSION" > stats.md 
+         echo "* TTAC Version : $ITAC_VERSION" > stats.md 
+         echo "* Mpi-Checker (clang-tidy) version : $MPI_CHECKER_VERSION" > stats.md 
+         echo "* PARCOACH Version : $PARCOACH_VERSION" > stats.md
+# build new readme
+         cat skeleton.md stats.md > readme.md
+         git add readme.md images/*
+         git commit -m"Updated" 
+         git push
 
