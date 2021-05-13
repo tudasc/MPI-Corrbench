@@ -16,15 +16,15 @@ jobs:
       - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev
       - run : sudo pip3 install numpy pandas lxml html5lib BeautifulSoup4
 # install MUST
-      - name: Cache MUST
-        id: cache-must
-        uses: actions/cache@v2
-        with:
-          path: MUST_install
-          key: ${{ runner.os }}-must-1.7.0
+#      - name: Cache MUST
+#        id: cache-must
+#        uses: actions/cache@v2
+#        with:
+#          path: MUST_install
+#          key: ${{ runner.os }}-must-1.7.0
       
       - name: Build MUST
-        if: steps.cache-must.outputs.cache-hit != 'true'
+#        if: steps.cache-must.outputs.cache-hit != 'true'
         run: |
               bash ./scripts/MUST/install_tool.sh
 # setup env or running
