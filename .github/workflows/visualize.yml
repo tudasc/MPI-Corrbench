@@ -164,10 +164,10 @@ jobs:
          cd mpi-corrbench-dashboard
          echo "* Visualization generated on $(date)" > stats.md
          echo "* Using  [Corrbench](https://github.com/tudasc/mpi-corrbench "MPI-CorrBench") version [$( echo ${GITHUB_SHA} | cut -c1-8)](https://github.com/tudasc/mpi-corrbench/commit/$GITHUB_SHA)" >> stats.md
-         echo "* Must Version : $MUST_VERSION" > stats.md 
-         echo "* TTAC Version : $ITAC_VERSION" > stats.md 
-         echo "* Mpi-Checker (clang-tidy) version : $MPI_CHECKER_VERSION" > stats.md 
-         echo "* PARCOACH Version : $PARCOACH_VERSION" > stats.md
+         echo "* Must Version : $MUST_VERSION" >> stats.md 
+         echo "* TTAC Version : $ITAC_VERSION" >> stats.md 
+         echo "* Mpi-Checker (clang-tidy) version : $MPI_CHECKER_VERSION" >> stats.md 
+         echo "* PARCOACH Version : $PARCOACH_VERSION" >> stats.md
          # build new readme
          cat skeleton.md stats.md > README.md
          git add README.md images/*
