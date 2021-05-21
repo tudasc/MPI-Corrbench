@@ -35,7 +35,7 @@ for TOOL in $TOOLS ; do
 	
 	for dir in $IN_DIR/$TOOL/* ; do
 	    if [ -d "$dir" ]; then
-		python3 $SCRIPTS_DIR/Parser.py $dir $TOOL --BENCH_BASE_DIR $BENCH_BASE_DIR &
+		python3 $SCRIPTS_DIR/Parser.py $dir $TOOL &
     	    fi
 	done
 	

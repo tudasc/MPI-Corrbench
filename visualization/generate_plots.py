@@ -2,13 +2,26 @@
 from analyze_helper import *
 import os
 import matplotlib.pyplot as plt
+import argparse
 
 Tools = ['MUST', 'ITAC', 'MPI-Checker', 'PARCOACH']
 
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
 
+def parse_command_line_args():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Script that generates the evaluation plots"
+        )
+    )
 
-def get_plot(output_name, fail, true_negative, true_positive, false_negative, false_positive, good_warn):
+    parser.add_argument('--format', default="pdf")
+
+    args = parser.parse_args()
+    return args
+
+
+def get_plot(output_name, fail, true_negative, true_positive, false_negative, false_positive, good_warn,output_format):
     plt.rcParams.update({'font.size': 18})
     pos = [1, 2.15, 3, 4.25]
     names_1 = ["MUST", "ITAC"]
@@ -89,9 +102,12 @@ def get_plot(output_name, fail, true_negative, true_positive, false_negative, fa
     plt.legend(label_handler, label_text, loc='lower center', bbox_to_anchor=(-0.25, -0.35), ncol=6, columnspacing=0.8,
                handletextpad=0.5, handlelength=1)
     # save to pdf
-    plt.savefig(output_name + ".pdf", bbox_inches='tight')
+    plt.savefig(output_name + "."+output_format, bbox_inches='tight')
 
 def main():
+
+    ARGS = parse_command_line_args()
+
     raw_data = load_data(Tools,BENCH_BASE_DIR)
     data = reduce_data(load_data(Tools,BENCH_BASE_DIR),Tools)
     by_tools=score_by_tool(Tools,data)
@@ -107,7 +123,7 @@ def main():
 
     true_negative = [x + y for x, y in zip(bad_warn, true_negative)]
 
-    get_plot("basic_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn)
+    get_plot("basic_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn,ARGS.format)
 
     # plot by category
     for category in categories:
@@ -137,7 +153,7 @@ def main():
 
         true_negative = [x + y for x, y in zip(true_negative, bad_warn)]
 
-        get_plot(category + "_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn)
+        get_plot(category + "_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn,ARGS.format)
 
 if __name__ == '__main__':
     main()

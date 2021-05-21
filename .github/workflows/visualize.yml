@@ -1,0 +1,155 @@
+name: visualize
+on:
+ push:
+  branches:
+    - main
+ workflow_dispatch:
+
+jobs:
+  run-must:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites for must
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev
+      - run : sudo pip3 install numpy pandas lxml html5lib BeautifulSoup4
+# install MUST     
+      - name: Build MUST
+        run: |
+              bash ./scripts/MUST/install_tool.sh
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           export PATH=$PATH:${GITHUB_WORKSPACE}/MUST_install/bin && \
+           export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib && \
+           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib && \
+           export CPATH=$CPATH:${GITHUB_WORKSPACE}/MUST_install/include && \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_MUST
+          path: ${{ github.workspace }}/experiment/MUST/results_MUST.json
+
+
+
+
+  run-parcoach:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9 llvm-9-dev
+# install PARCOACH
+      - name: Build PARCOACH
+        run: |
+           bash ./scripts/PARCOACH/install_tool.sh
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           export PARCOACH_ROOT=${GITHUB_WORKSPACE}/parcoach
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh PARCOACH
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_PARCOACH
+          path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
+
+
+  run-mpi-checker:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    steps:
+      - uses: actions/checkout@v2
+# install clang-tidy
+      - run : sudo apt-get update && sudo apt-get install -y clang-tidy libopenmpi-dev
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MPI-Checker
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_MPI-Checker
+          path: ${{ github.workspace }}/experiment/MPI-Checker/results_MPI-Checker.json
+
+
+  generate-visualization:
+    needs: [run-mpi-checker, run-parcoach, run-must]
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MUST_VERSION: "1.7.0"
+      ITAC_VERSION: "(No Data for itac: No Licnse to execute it in CI container)"
+      MPI_CHECKER_VERSION: "10.0"
+      PARCOACH_VERSION: "6990ff4 (master)"
+    steps:
+     - uses: actions/checkout@v2
+     - run: mkdir output 
+     - run : sudo pip3 install numpy pandas matplotlib
+
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_MUST
+         path: ${{ github.workspace }}/output
+         
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_PARCOACH
+         path: ${{ github.workspace }}/output
+
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_MPI-Checker
+         path: ${{ github.workspace }}/output   
+  
+     - name: add missing data
+       run: python3 add_missing_data.py
+       working-directory: ${{ github.workspace }}/visualization
+       
+     - name: generate svg plots
+       run: python3 generate_plots.py --format svg
+       working-directory: ${{ github.workspace }}/visualization
+
+     - name: generate pdf plots
+       run: python3 generate_plots.py
+       working-directory: ${{ github.workspace }}/visualization
+
+     - uses: actions/upload-artifact@v2
+       with:
+          name: visualization_plots
+          path: ${{ github.workspace }}/visualization/*.pdf
+
+     - name: update dashboard
+       working-directory: ${{ github.workspace }}/visualization
+       run: |
+         # Git setup
+         export GITHUB_USER=corrbench-bot
+         echo "GITHUB_USER=$GITHUB_USER" >> $GITHUB_ENV
+         echo "GITHUB_TOKEN=${{ secrets.dashboard_update_token }}" >> $GITHUB_ENV
+         git config --global user.email "corrbench-bot@users.noreply.github.com"
+         git config --global user.name $GITHUB_USER
+         git clone https://$GITHUB_USER:${{ secrets.dashboard_update_token }}@github.com/tudasc/mpi-corrbench-dashboard.git --depth 1
+         #copy images and write the stats
+         cp *.svg mpi-corrbench-dashboard/images
+         cd mpi-corrbench-dashboard
+         echo "* Visualization generated on $(date)" > stats.md
+         echo "* Using  [Corrbench](https://github.com/tudasc/mpi-corrbench \"MPI-CorrBench\") version [$( echo ${GITHUB_SHA} | cut -c1-8)](https://github.com/tudasc/mpi-corrbench/commit/$GITHUB_SHA)" >> stats.md
+         echo "* Must Version : $MUST_VERSION" >> stats.md 
+         echo "* TTAC Version : $ITAC_VERSION" >> stats.md 
+         echo "* Mpi-Checker (clang-tidy) version : $MPI_CHECKER_VERSION" >> stats.md 
+         echo "* PARCOACH Version : $PARCOACH_VERSION" >> stats.md
+         # build new readme
+         cat skeleton.md stats.md > README.md
+         git add README.md images/*
+         git commit -m"Updated" 
+         git push
+
