@@ -2,7 +2,7 @@
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
-# in $(pwd) ist eine datei testcase.c , die ausgewertet werden soll
+# in $(pwd) will be the file testcase.c , that should be evaluated
 
 mpicc -g testcase.c -lm
 
