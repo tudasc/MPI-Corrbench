@@ -1,4 +1,4 @@
-# MPI-CorrBench &middot; [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) 
+# MPI-CorrBench 1.1.0 &middot; [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) 
 
 MPI-CorrBench \[[CORRBE21](#ref-Corrbe21)\] enables a structured comparison of the different available tools for MPI correctness checking  w.r.t. various types of errors.
 
