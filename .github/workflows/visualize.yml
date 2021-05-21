@@ -1,10 +1,11 @@
 name: visualize
 on:
  push:
-#  branches:
-#    - main
-jobs:
+  branches:
+    - main
+ workflow_dispatch:
 
+jobs:
   run-must:
     runs-on: ubuntu-latest
     env:
