@@ -1,6 +1,10 @@
-# MPI-CorrBench 1.1.0 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) 
+# MPI-CorrBench 1.2.0 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![visualize](https://github.com/tudasc/MPI-Corrbench/actions/workflows/visualize.yml/badge.svg?branch=main)](https://github.com/tudasc/mpi-corrbench-dashboard)
 
 MPI-CorrBench \[[CORRBE21](#ref-Corrbe21)\] enables a structured comparison of the different available tools for MPI correctness checking  w.r.t. various types of errors.
+
+## [Visualization Dashboard](https://github.com/tudasc/mpi-corrbench-dashboard)
+MPI-CorrBench is automatically executed by our CI pipeline.
+You can find the automatically generated visualizations in our [Visualization Dashboard](https://github.com/tudasc/mpi-corrbench-dashboard).
 
 ## Usage
 Provide the Following environment Variables:
