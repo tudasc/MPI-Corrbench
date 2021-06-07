@@ -41,9 +41,6 @@ jobs:
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
     steps:
       - uses: actions/checkout@v2
-# prerequisites
-#      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev
-#      - run : sudo pip3 install numpy pandas lxml html5lib BeautifulSoup4
 # install ITAC     
       - name: install ITAC
         run: |
