@@ -3,6 +3,7 @@ on:
  push:
   branches:
     - main
+    - feat/CI-itac
  workflow_dispatch:
 
 jobs:
