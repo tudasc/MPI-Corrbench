@@ -34,7 +34,30 @@ jobs:
           name: results_MUST
           path: ${{ github.workspace }}/experiment/MUST/results_MUST.json
 
-
+  run-itac:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites
+#      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev
+#      - run : sudo pip3 install numpy pandas lxml html5lib BeautifulSoup4
+# install ITAC     
+      - name: install ITAC
+        run: |
+              bash ./scripts/ITAC/install_tool.sh
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           source ${GITHUB_WORKSPACE}/ITAC_install/setvars.sh && \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh ITAC
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_ITAC
+          path: ${{ github.workspace }}/experiment/ITAC/results_ITAC.json
 
 
   run-parcoach:
@@ -84,7 +107,7 @@ jobs:
 
   generate-visualization:
 #    needs: [run-mpi-checker, run-parcoach, run-must]
-    needs: [run-mpi-checker, run-parcoach]
+    needs: [run-mpi-checker, run-parcoach, run-itac]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
@@ -101,6 +124,11 @@ jobs:
 #       with:
 #         name: results_MUST
 #         path: ${{ github.workspace }}/output
+
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_ITAC
+         path: ${{ github.workspace }}/output
          
      - uses: actions/download-artifact@v2
        with:
