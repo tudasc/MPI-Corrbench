@@ -1,7 +1,4 @@
-
-module purge
-module load intel intelmpi
-
+#!/bin/bash
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
