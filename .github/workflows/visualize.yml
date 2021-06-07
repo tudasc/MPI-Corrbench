@@ -3,7 +3,6 @@ on:
  push:
   branches:
     - main
-    - feat/CI-itac
  workflow_dispatch:
 
 jobs:
@@ -107,7 +106,7 @@ jobs:
 
 
   generate-visualization:
-#    needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
+    needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
@@ -120,25 +119,25 @@ jobs:
      - run: mkdir output 
      - run : sudo pip3 install numpy pandas matplotlib
 
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: results_MUST
-#         path: ${{ github.workspace }}/output
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_MUST
+         path: ${{ github.workspace }}/output
 
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: results_ITAC
-#         path: ${{ github.workspace }}/output
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_ITAC
+         path: ${{ github.workspace }}/output
          
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: results_PARCOACH
-#         path: ${{ github.workspace }}/output
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_PARCOACH
+         path: ${{ github.workspace }}/output
 
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: results_MPI-Checker
-#         path: ${{ github.workspace }}/output   
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_MPI-Checker
+         path: ${{ github.workspace }}/output   
   
      - name: add missing data
        run: python3 add_missing_data.py
