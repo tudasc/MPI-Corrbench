@@ -34,7 +34,27 @@ jobs:
           name: results_MUST
           path: ${{ github.workspace }}/experiment/MUST/results_MUST.json
 
-
+  run-itac:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+      MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    steps:
+      - uses: actions/checkout@v2
+# install ITAC     
+      - name: install ITAC
+        run: |
+              bash ./scripts/ITAC/install_tool.sh
+# setup env or running
+      - run: mkdir experiment
+      - name: Run CorrBench
+        run: |
+           source ${GITHUB_WORKSPACE}/ITAC_install/setvars.sh && \
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh ITAC
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results_ITAC
+          path: ${{ github.workspace }}/experiment/ITAC/results_ITAC.json
 
 
   run-parcoach:
@@ -83,12 +103,12 @@ jobs:
 
 
   generate-visualization:
-    needs: [run-mpi-checker, run-parcoach, run-must]
+    needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MUST_VERSION: "1.7.0"
-      ITAC_VERSION: "(No Data for itac: No Licnse to execute it in CI container)"
+      ITAC_VERSION: "2021.2.0-215"
       MPI_CHECKER_VERSION: "10.0"
       PARCOACH_VERSION: "6990ff4 (master)"
     steps:
@@ -99,6 +119,11 @@ jobs:
      - uses: actions/download-artifact@v2
        with:
          name: results_MUST
+         path: ${{ github.workspace }}/output
+
+     - uses: actions/download-artifact@v2
+       with:
+         name: results_ITAC
          path: ${{ github.workspace }}/output
          
      - uses: actions/download-artifact@v2
@@ -150,6 +175,6 @@ jobs:
          # build new readme
          cat skeleton.md stats.md > README.md
          git add README.md images/*
-         git commit -m"Updated" 
+         git commit -m"Updated (${{ github.event.commits[0].message }})" 
          git push
 
