@@ -2,7 +2,10 @@
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
-mpicc --showme:compile
+which clang
+clang --version
+which clang-9
+
 
 clang -DEXCLUDE_PARCOACH_UNSUPPORTED_FUNCTIONS $(mpicc --showme:compile) -c -g -emit-llvm testcase.c -o testcase.bc
 
