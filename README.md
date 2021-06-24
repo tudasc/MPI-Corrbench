@@ -1,4 +1,4 @@
-# MPI-CorrBench 1.2.2 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![visualize](https://github.com/tudasc/MPI-Corrbench/actions/workflows/visualize.yml/badge.svg?branch=main)](https://github.com/tudasc/mpi-corrbench-dashboard)
+# MPI-CorrBench 1.2.3 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![visualize](https://github.com/tudasc/MPI-Corrbench/actions/workflows/visualize.yml/badge.svg?branch=main)](https://github.com/tudasc/mpi-corrbench-dashboard)
 
 MPI-CorrBench \[[CORRBE21](#ref-Corrbe21)\] enables a structured comparison of the different available tools for MPI correctness checking  w.r.t. various types of errors.
 
@@ -25,5 +25,5 @@ The visualizations presented in \[[CORRBE21](#ref-Corrbe21)\] can be generated b
 <tr>
     <td valign="top"><a name="ref-Corrbe21"></a>[CORRBE21]</td>
     <td>Lehr, Jan-Patrick and Jammer, Tim and Bischof, Christian:
-      MPI-CorrBench: Towards an MPI Correctness Benchmark Suite 2021.</td>
+      MPI-CorrBench: Towards an MPI Correctness Benchmark Suite 2021. https://dl.acm.org/doi/abs/10.1145/3431379.3460652</td>
 </tr>
