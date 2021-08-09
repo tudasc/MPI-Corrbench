@@ -17,7 +17,7 @@ jobs:
               cd $MPI_CORRECTNESS_BM_DIR/micro-benches && \
               export CPATH=$CPATH:./0-level/correct/include && \
               for i in $(find . -type f -name "*.c"); \
-              do echo Check code Froat for $i ; \
+              do echo Check code Format for $i ; \
               clang-format -style=file --dry-run --Werror $i;\
               if [[ $? -ne 0 ]]; then exit -1; fi;\
               done
