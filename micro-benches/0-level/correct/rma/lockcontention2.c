@@ -4,9 +4,9 @@
  *      See COPYRIGHT in top-level directory.
  */
 #include "mpi.h"
+#include "mpitest.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "mpitest.h"
 
 /*
  * Tests for lock contention, including special cases within the MPICH code
@@ -47,238 +47,231 @@ static int toterrs = 0;
 
 int testValues(int, int, int, int *, const char *);
 
-int main(int argc, char *argv[])
-{
-    int rank, wsize, i, j, cnt;
-    int *rmabuf, *localbuf, *localbuf2, *vals;
-    MPI_Win win;
-    int trank = 0;
-    int windowsize;
+int main(int argc, char *argv[]) {
+  int rank, wsize, i, j, cnt;
+  int *rmabuf, *localbuf, *localbuf2, *vals;
+  MPI_Win win;
+  int trank = 0;
+  int windowsize;
 
-    MTest_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &wsize);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MTest_Init(&argc, &argv);
+  MPI_Comm_size(MPI_COMM_WORLD, &wsize);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (wsize < 2) {
-        fprintf(stderr, "Run this program with at least 2 processes\n");
-        MPI_Abort(MPI_COMM_WORLD, 1);
+  if (wsize < 2) {
+    fprintf(stderr, "Run this program with at least 2 processes\n");
+    MPI_Abort(MPI_COMM_WORLD, 1);
+  }
+
+  windowsize = (2 * NBLOCK + 2) * NELM * wsize;
+  rmabuf = (int *)malloc(windowsize * sizeof(int));
+  localbuf = (int *)malloc(NELM * sizeof(int));
+  localbuf2 = (int *)malloc(NELM * NBLOCK * sizeof(int));
+  vals = (int *)malloc(NELM * sizeof(int));
+
+  /*
+   * Initialize the buffers
+   */
+  for (i = 0; i < NELM; i++) {
+    localbuf[i] = rank + i * wsize;
+  }
+  cnt = 0;
+  for (i = 0; i < NELM; i++) {
+    for (j = 0; j < NBLOCK; j++) {
+      localbuf2[cnt++] = j + NBLOCK * (rank + i * wsize);
     }
+  }
+  for (i = 0; i < windowsize; i++) {
+    rmabuf[i] = -1;
+  }
 
-    windowsize = (2 * NBLOCK + 2) * NELM * wsize;
-    rmabuf = (int *) malloc(windowsize * sizeof(int));
-    localbuf = (int *) malloc(NELM * sizeof(int));
-    localbuf2 = (int *) malloc(NELM * NBLOCK * sizeof(int));
-    vals = (int *) malloc(NELM * sizeof(int));
+  /* Create the window */
+  MPI_Win_create(rmabuf, windowsize * sizeof(int), sizeof(int), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
 
-    /*
-     * Initialize the buffers
-     */
-    for (i = 0; i < NELM; i++) {
-        localbuf[i] = rank + i * wsize;
+  /* Multiple puts, with contention at trank */
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (i = 0; i < NELM; i++) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
+    MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + (i + NELM) * wsize, 1, MPI_INT, win);
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank == trank) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    toterrs += testValues(1, NELM, wsize, rmabuf, "Multiple puts (1)");
+    toterrs += testValues(1, NELM, wsize, rmabuf + wsize * NELM, "Multiple puts (2)");
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  /* Reinit the rmabuf */
+  for (i = 0; i < windowsize; i++) {
+    rmabuf[i] = -1;
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  /* Single put with contention */
+  trank = 0;
+  for (i = 0; i < NELM; i++) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank == trank) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    toterrs += testValues(1, NELM, wsize, rmabuf, "Single put");
+    MPI_Win_unlock(trank, win);
+  }
+
+  /* Reinit the rmabuf */
+  for (i = 0; i < windowsize; i++) {
+    rmabuf[i] = -1;
+  }
+  /* Longer puts with contention at trank */
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (i = 0; i < NELM; i++) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    if (rank != trank) {
+      MPI_Put(&localbuf2[i * NBLOCK], NBLOCK, MPI_INT, trank, NELM * wsize + NBLOCK * (rank + i * wsize), NBLOCK,
+              MPI_INT, win);
+      MPI_Put(&localbuf2[i * NBLOCK], NBLOCK, MPI_INT, trank, NELM * wsize + NBLOCK * (rank + (i + NELM) * wsize),
+              NBLOCK, MPI_INT, win);
     }
-    cnt = 0;
+    MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank == trank) {
+    /* For simplicity in testing, set the values that rank==trank
+     * would have set. */
     for (i = 0; i < NELM; i++) {
-        for (j = 0; j < NBLOCK; j++) {
-            localbuf2[cnt++] = j + NBLOCK * (rank + i * wsize);
+      for (j = 0; j < NBLOCK; j++) {
+        rmabuf[NELM * wsize + NBLOCK * (trank + i * wsize) + j] = j + NBLOCK * (trank + i * wsize);
+        rmabuf[NELM * wsize + NBLOCK * (trank + (i + NELM) * wsize) + j] = j + NBLOCK * (trank + i * wsize);
+      }
+    }
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    toterrs += testValues(1, NELM, wsize, rmabuf, "Long puts (1)");
+    toterrs += testValues(NBLOCK, NELM, wsize, rmabuf + NELM * wsize, "Long puts(2)");
+    toterrs += testValues(NBLOCK, NELM, wsize, rmabuf + NELM * wsize * (1 + NBLOCK), "Long puts(3)");
+    MPI_Win_unlock(trank, win);
+  }
+
+  /* Reinit the rmabuf */
+  for (i = 0; i < windowsize; i++) {
+    rmabuf[i] = -1;
+  }
+  for (i = 0; i < NELM; i++)
+    vals[i] = -2;
+
+  /* Put mixed with Get */
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (i = 0; i < NELM; i++) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    if (rank != trank) {
+      MPI_Put(&localbuf2[i], NBLOCK, MPI_INT, trank, NELM * wsize + NBLOCK * (rank + i * wsize), NBLOCK, MPI_INT, win);
+      MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
+    } else {
+      MPI_Get(&vals[i], 1, MPI_INT, trank, i, 1, MPI_INT, win);
+    }
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank == trank) {
+    /* Just test the Get */
+    for (i = 0; i < wsize; i++) {
+      if (i == trank) {
+        if (vals[i] != -1) {
+          toterrs++;
+          if (toterrs < MAX_ERRS_REPORT) {
+            printf("put/get: vals[%d] = %d, expected -1\n", i, vals[i]);
+          }
         }
-    }
-    for (i = 0; i < windowsize; i++) {
-        rmabuf[i] = -1;
-    }
-
-    /* Create the window */
-    MPI_Win_create(rmabuf, windowsize * sizeof(int), sizeof(int), MPI_INFO_NULL,
-                   MPI_COMM_WORLD, &win);
-
-    /* Multiple puts, with contention at trank */
-    MPI_Barrier(MPI_COMM_WORLD);
-    for (i = 0; i < NELM; i++) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
-        MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + (i + NELM) * wsize, 1, MPI_INT, win);
-        MPI_Win_unlock(trank, win);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == trank) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        toterrs += testValues(1, NELM, wsize, rmabuf, "Multiple puts (1)");
-        toterrs += testValues(1, NELM, wsize, rmabuf + wsize * NELM, "Multiple puts (2)");
-        MPI_Win_unlock(trank, win);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    /* Reinit the rmabuf */
-    for (i = 0; i < windowsize; i++) {
-        rmabuf[i] = -1;
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-
-    /* Single put with contention */
-    trank = 0;
-    for (i = 0; i < NELM; i++) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
-        MPI_Win_unlock(trank, win);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == trank) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        toterrs += testValues(1, NELM, wsize, rmabuf, "Single put");
-        MPI_Win_unlock(trank, win);
-    }
-
-    /* Reinit the rmabuf */
-    for (i = 0; i < windowsize; i++) {
-        rmabuf[i] = -1;
-    }
-    /* Longer puts with contention at trank */
-    MPI_Barrier(MPI_COMM_WORLD);
-    for (i = 0; i < NELM; i++) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        if (rank != trank) {
-            MPI_Put(&localbuf2[i * NBLOCK], NBLOCK, MPI_INT, trank,
-                    NELM * wsize + NBLOCK * (rank + i * wsize), NBLOCK, MPI_INT, win);
-            MPI_Put(&localbuf2[i * NBLOCK], NBLOCK, MPI_INT, trank,
-                    NELM * wsize + NBLOCK * (rank + (i + NELM) * wsize), NBLOCK, MPI_INT, win);
+      } else if (vals[i] != i && vals[i] != -1) {
+        toterrs++;
+        if (toterrs < MAX_ERRS_REPORT) {
+          printf("put/get: vals[%d] = %d, expected -1 or %d\n", i, vals[i], i);
         }
-        MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
-        MPI_Win_unlock(trank, win);
+      }
     }
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == trank) {
-        /* For simplicity in testing, set the values that rank==trank
-         * would have set. */
-        for (i = 0; i < NELM; i++) {
-            for (j = 0; j < NBLOCK; j++) {
-                rmabuf[NELM * wsize + NBLOCK * (trank + i * wsize) + j] =
-                    j + NBLOCK * (trank + i * wsize);
-                rmabuf[NELM * wsize + NBLOCK * (trank + (i + NELM) * wsize) + j] =
-                    j + NBLOCK * (trank + i * wsize);
-            }
-        }
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        toterrs += testValues(1, NELM, wsize, rmabuf, "Long puts (1)");
-        toterrs += testValues(NBLOCK, NELM, wsize, rmabuf + NELM * wsize, "Long puts(2)");
-        toterrs += testValues(NBLOCK, NELM, wsize,
-                              rmabuf + NELM * wsize * (1 + NBLOCK), "Long puts(3)");
-        MPI_Win_unlock(trank, win);
-    }
+  }
 
-    /* Reinit the rmabuf */
-    for (i = 0; i < windowsize; i++) {
-        rmabuf[i] = -1;
-    }
-    for (i = 0; i < NELM; i++)
-        vals[i] = -2;
+  /* Contention only with get */
+  for (i = 0; i < windowsize; i++) {
+    rmabuf[i] = -i;
+  }
+  for (i = 0; i < NELM; i++)
+    vals[i] = -2;
 
-    /* Put mixed with Get */
-    MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (i = 0; i < NELM; i++) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    MPI_Get(&vals[i], 1, MPI_INT, trank, i, 1, MPI_INT, win);
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank == trank) {
     for (i = 0; i < NELM; i++) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        if (rank != trank) {
-            MPI_Put(&localbuf2[i], NBLOCK, MPI_INT, trank,
-                    NELM * wsize + NBLOCK * (rank + i * wsize), NBLOCK, MPI_INT, win);
-            MPI_Put(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, win);
-        } else {
-            MPI_Get(&vals[i], 1, MPI_INT, trank, i, 1, MPI_INT, win);
+      if (vals[i] != -i) {
+        toterrs++;
+        if (toterrs < MAX_ERRS_REPORT) {
+          printf("single get: vals[%d] = %d, expected %d\n", i, vals[i], -i);
         }
-        MPI_Win_unlock(trank, win);
+      }
     }
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == trank) {
-        /* Just test the Get */
-        for (i = 0; i < wsize; i++) {
-            if (i == trank) {
-                if (vals[i] != -1) {
-                    toterrs++;
-                    if (toterrs < MAX_ERRS_REPORT) {
-                        printf("put/get: vals[%d] = %d, expected -1\n", i, vals[i]);
-                    }
-                }
-            } else if (vals[i] != i && vals[i] != -1) {
-                toterrs++;
-                if (toterrs < MAX_ERRS_REPORT) {
-                    printf("put/get: vals[%d] = %d, expected -1 or %d\n", i, vals[i], i);
-                }
-            }
-        }
-    }
+  }
 
-    /* Contention only with get */
-    for (i = 0; i < windowsize; i++) {
-        rmabuf[i] = -i;
-    }
-    for (i = 0; i < NELM; i++)
-        vals[i] = -2;
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    for (i = 0; i < NELM; i++) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        MPI_Get(&vals[i], 1, MPI_INT, trank, i, 1, MPI_INT, win);
-        MPI_Win_unlock(trank, win);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == trank) {
-        for (i = 0; i < NELM; i++) {
-            if (vals[i] != -i) {
-                toterrs++;
-                if (toterrs < MAX_ERRS_REPORT) {
-                    printf("single get: vals[%d] = %d, expected %d\n", i, vals[i], -i);
-                }
-            }
-        }
-    }
-
-    /* Contention with accumulate */
-    MPI_Barrier(MPI_COMM_WORLD);
+  /* Contention with accumulate */
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (i = 0; i < NELM * wsize; i++) {
+    rmabuf[i] = 0;
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (i = 0; i < NELM; i++) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
+    MPI_Accumulate(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, MPI_SUM, win);
+    MPI_Accumulate(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, MPI_SUM, win);
+    MPI_Win_unlock(trank, win);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank == trank) {
+    MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
     for (i = 0; i < NELM * wsize; i++) {
-        rmabuf[i] = 0;
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    for (i = 0; i < NELM; i++) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        MPI_Accumulate(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, MPI_SUM, win);
-        MPI_Accumulate(&localbuf[i], 1, MPI_INT, trank, rank + i * wsize, 1, MPI_INT, MPI_SUM, win);
-        MPI_Win_unlock(trank, win);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == trank) {
-        MPI_Win_lock(MPI_LOCK_EXCLUSIVE, trank, 0, win);
-        for (i = 0; i < NELM * wsize; i++) {
-            if (rmabuf[i] != 2 * i) {
-                toterrs++;
-                if (toterrs < MAX_ERRS_REPORT) {
-                    printf("2 accumulate: rmabuf[%d] = %d, expected %d\n", i, rmabuf[i], 2 * i);
-                }
-            }
+      if (rmabuf[i] != 2 * i) {
+        toterrs++;
+        if (toterrs < MAX_ERRS_REPORT) {
+          printf("2 accumulate: rmabuf[%d] = %d, expected %d\n", i, rmabuf[i], 2 * i);
         }
-        MPI_Win_unlock(trank, win);
+      }
     }
+    MPI_Win_unlock(trank, win);
+  }
 
-    MPI_Win_free(&win);
+  MPI_Win_free(&win);
 
-    free(rmabuf);
-    free(localbuf);
-    free(localbuf2);
-    free(vals);
+  free(rmabuf);
+  free(localbuf);
+  free(localbuf2);
+  free(vals);
 
-    MTest_Finalize(toterrs);
-    return MTestReturnValue(toterrs);
+  MTest_Finalize(toterrs);
+  return MTestReturnValue(toterrs);
 }
 
 /* Test the values in the rmabuf against the expected values.  Return the
    number of errors */
-int testValues(int nb, int nelm, int wsize, int *rmabuf, const char *msg)
-{
-    int i, errs = 0;
+int testValues(int nb, int nelm, int wsize, int *rmabuf, const char *msg) {
+  int i, errs = 0;
 
-    for (i = 0; i < nb * nelm * wsize; i++) {
-        if (rmabuf[i] != i) {
-            if (toterrs + errs < MAX_ERRS_REPORT) {
-                printf("%s:rmabuf[%d] = %d expected %d\n", msg, i, rmabuf[i], i);
-            }
-            errs++;
-        }
+  for (i = 0; i < nb * nelm * wsize; i++) {
+    if (rmabuf[i] != i) {
+      if (toterrs + errs < MAX_ERRS_REPORT) {
+        printf("%s:rmabuf[%d] = %d expected %d\n", msg, i, rmabuf[i], i);
+      }
+      errs++;
     }
+  }
 
-    return errs;
+  return errs;
 }
