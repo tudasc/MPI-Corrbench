@@ -1,0 +1,49 @@
+name: visualize
+on:
+ push
+
+
+jobs:
+  test-format:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites
+      - run : sudo apt-get update && sudo apt-get install -y openmpi-bin libopenmpi-dev  clang-format
+  
+      - name: Check code Formatting
+        run: |
+              cd $MPI_CORRECTNESS_BM_DIR/micro-benches && \
+              export CPATH=$CPATH:./0-level/correct/include && \
+              for i in $(find . -type f -name "*.c"); \
+              do echo Check code Froat for $i ; \
+              clang-format -style=file --dry-run --Werror $i;\
+              if [[ $? -ne 0 ]]; then exit -1; fi;\
+              done
+
+
+
+
+  test-format:
+    runs-on: ubuntu-latest
+    env:
+      MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v2
+# prerequisites
+      - run : sudo apt-get update && sudo apt-get install -y openmpi-bin libopenmpi-dev
+
+
+      - name: Check compilation
+        run: |
+              cd $MPI_CORRECTNESS_BM_DIR/micro-benches && \
+              export CPATH=$CPATH:./0-level/correct/include && \
+              for i in $(find . -type f -name "*.c"); \
+              do echo Compiling $i ; \
+              mpicc $i -Wall -pedantic -Wno-unused-variable -Wno-unused-but-set-variable -fopenmp -lm;\
+              if [[ $? -ne 0 ]]; then exit -1; fi;\
+              done
+
+
