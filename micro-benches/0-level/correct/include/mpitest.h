@@ -8,6 +8,7 @@
 #define MPITEST_H_INCLUDED
 
 #include <string.h>
+#include <mpi.h>
 #include "mpitestconf.h"
 
 /*
