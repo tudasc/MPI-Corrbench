@@ -73,7 +73,7 @@ echo "mkdir -p $OUT_DIR/$TOOL/\$SLURM_ARRAY_JOB_ID/\$SLURM_ARRAY_TASK_ID" >> $SC
 echo "mkdir -p $OUT_DIR/$TOOL/\$SLURM_ARRAY_JOB_ID/\$SLURM_ARRAY_TASK_ID" >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
 echo "cd $OUT_DIR/$TOOL/\$SLURM_ARRAY_JOB_ID/\$SLURM_ARRAY_TASK_ID" >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
 echo "cp \$THIS_CASE $OUT_DIR/$TOOL/\$SLURM_ARRAY_JOB_ID/\$SLURM_ARRAY_TASK_ID/testcase.c" >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
-echo "export CPATH=\$CPATH:$SRC_DIR/0-level/correct/include" >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
+echo "export CPATH=\$CPATH:$SRC_DIR/0-level/correct/include:$SRC_DIR/0-level/openmp" >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
 echo 'if [ ! -f compile_overhead.csv ]; then echo "baseline_time,baseline_mem,time,mem" >> compile_overhead.csv ; fi' >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
 echo 'if [ ! -f run_overhead.csv ]; then echo "baseline_time,baseline_mem,time,mem" >> run_overhead.csv ; fi' >> $SCRIPTS_DIR/$TOOL/2Ranks.sh
 # for later evaluation, there is no need to keep the src-file around, for convenience, we keep the filename
