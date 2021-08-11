@@ -25,7 +25,7 @@ static inline void has_error_manifested(bool manifested) {
 }
 
 // Tell Corrbench if the user expectation was met
-static inline void has_error_manifested(bool manifested) {
+static inline void was_user_expectation_met(bool manifested) {
   // else do nothing: we assume that an error was present unless signaled otherwise
   if (!manifested) {
     // just create the signal file
