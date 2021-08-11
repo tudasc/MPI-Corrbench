@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     {
       int *buffer = malloc(BUFFER_LENGTH_BYTE);
       MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD);
-      MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       free(buffer);
     }  // end parallel
   }
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   else {  // other MPI rank
     int *buffer = malloc(BUFFER_LENGTH_BYTE);
     MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD);
+    MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD);
     free(buffer);
   }
 
