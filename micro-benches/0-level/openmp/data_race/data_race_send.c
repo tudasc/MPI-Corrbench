@@ -47,8 +47,13 @@ int main(int argc, char *argv[]) {
   } else {
     fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 6);
     MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    has_error_manifested(!has_buffer_expected_content(buffer, BUFFER_LENGTH_BYTE, 0));
+    // no ordering of modification either buffer is fine, as long as it is not corrupted
+    has_error_manifested(!(has_buffer_expected_content(buffer, BUFFER_LENGTH_BYTE, 0) ||
+                           !has_buffer_expected_content(buffer, BUFFER_LENGTH_BYTE, 3)));
     // printf("Receive Buffer %X\n", buffer[75]);//for reference
+    // printf("Has Buffer content of thread 0 (before modification)? %d\n",has_buffer_expected_content(buffer,
+    // BUFFER_LENGTH_BYTE, 0)); printf("Has Buffer content of thread 1 (after modification)?
+    // %d\n",has_buffer_expected_content(buffer, BUFFER_LENGTH_BYTE, 3));
   }
 
   free(buffer);
