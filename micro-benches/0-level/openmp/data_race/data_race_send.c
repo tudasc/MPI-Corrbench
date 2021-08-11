@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   if (myRank == 1) {
     fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 0);
 
-    //printf("Sending Buffer: %X\n", buffer[75]);//for reference
+    // printf("Sending Buffer: %X\n", buffer[75]);//for reference
 
 #pragma omp parallel
     {
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 6);
     MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     has_error_manifested(!has_buffer_expected_content(buffer, BUFFER_LENGTH_BYTE, 0));
-    //printf("Receive Buffer %X\n", buffer[75]);//for reference
+    // printf("Receive Buffer %X\n", buffer[75]);//for reference
   }
 
   free(buffer);
