@@ -1,9 +1,16 @@
+#ifndef CORRBENCH_NONDETERMINISM_H
+#define CORRBENCH_NONDETERMINISM_H
+
+#define USE_TEMP_COMPARE_BUF
+#define SIGNAL_FILE_NAME "error_not_present"
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
-#define USE_TEMP_COMPARE_BUF
-#define SIGNAL_FILE_NAME "error_not_present"
+#ifdef USE_TEMP_COMPARE_BUF
+#include <stdlib.h>
+#endif
 
 // Tell Corrbench if the error has manifested itself
 // or if there was no error e.g. "wrong" thread ordering prevented a data race
@@ -42,3 +49,5 @@ inline bool has_buffer_expected_content(void *buf, size_t length, int pattern) {
 
 #endif
 }
+
+#endif
