@@ -44,7 +44,7 @@ def parse_command_line_args():
     # parser.add_argument('IN_DIR')
     parser.add_argument('TOOL', choices=['MUST', 'ITAC', 'MPI-Checker', 'PARCOACH', 'TODO_More_Tools'])
     # parser.add_argument('--BENCH_BASE_DIR', default=".")
-    parser.add_argument('--outfile', default="[BENCH_BASE_DIR]/output/[TOOL].json")
+    parser.add_argument('--outfile', default="[BENCH_BASE_DIR]/output/results_[TOOL].json")
 
     args = parser.parse_args()
     return args
