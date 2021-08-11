@@ -22,10 +22,9 @@ int main(int argc, char *argv[]) {
   }
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-  int *buffer = malloc(BUFFER_LENGTH_BYTE);
-
 #pragma omp parallel
   {
+    int *buffer = malloc(BUFFER_LENGTH_BYTE);
     int tid = omp_get_thread_num();
     if (myRank == 0) {
       if (tid == 0) {
@@ -44,10 +43,9 @@ int main(int argc, char *argv[]) {
 #pragma omp barrier
       MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD);
     }
-
+    free(buffer);
   }  // end parallel
 
-  free(buffer);
   MPI_Finalize();
 
   return 0;

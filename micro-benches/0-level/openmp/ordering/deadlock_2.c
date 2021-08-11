@@ -22,22 +22,23 @@ int main(int argc, char *argv[]) {
   }
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-  int *buffer = malloc(BUFFER_LENGTH_BYTE);
-
   if (myRank == 0) {
 #pragma omp parallel
     {
+      int *buffer = malloc(BUFFER_LENGTH_BYTE);
       MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD);
       MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
+      free(buffer);
     }  // end parallel
   }
 
   else {  // other MPI rank
+    int *buffer = malloc(BUFFER_LENGTH_BYTE);
     MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD);
+    free(buffer);
   }
-  free(buffer);
+
   MPI_Finalize();
 
   return 0;
