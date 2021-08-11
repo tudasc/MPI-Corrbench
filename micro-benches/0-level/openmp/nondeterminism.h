@@ -27,9 +27,11 @@ static inline void has_error_manifested(bool manifested) {
 // this way we can find "wrong" message matching
 // sender and receiver need to use the same pattern_id
 
-const char pattern_list[8] = {0x0F, 0xF0, 0xAA, 0x55, 0x99, 0xCC, 0x00, 0xFF};
+const unsigned char pattern_list[8] = {0x0F, 0xF0, 0xAA, 0x55, 0x99, 0xCC, 0x00, 0xFF};
 
-static inline void fill_message_buffer(void *buf, size_t length, int pattern) { memset(buf, pattern_list[pattern], length); }
+static inline void fill_message_buffer(void *buf, size_t length, int pattern) {
+  memset(buf, pattern_list[pattern], length);
+}
 
 // check if message buffer is correct
 static inline bool has_buffer_expected_content(void *buf, size_t length, int pattern) {
