@@ -14,7 +14,7 @@
 
 // Tell Corrbench if the error has manifested itself
 // or if there was no error e.g. "wrong" thread ordering prevented a data race
-inline void has_error_manifested(bool manifested) {
+static inline void has_error_manifested(bool manifested) {
   // else do nothing: we assume that an error was present unless signaled otherwise
   if (!manifested) {
     // just create the signal file
@@ -29,10 +29,10 @@ inline void has_error_manifested(bool manifested) {
 
 const char pattern_list[8] = {0x0F, 0xF0, 0xAA, 0x55, 0x99, 0xCC, 0x00, 0xFF};
 
-inline void fill_message_buffer(void *buf, size_t length, int pattern) { memset(buf, pattern_list[pattern], length); }
+static inline void fill_message_buffer(void *buf, size_t length, int pattern) { memset(buf, pattern_list[pattern], length); }
 
 // check if message buffer is correct
-inline bool has_buffer_expected_content(void *buf, size_t length, int pattern) {
+static inline bool has_buffer_expected_content(void *buf, size_t length, int pattern) {
 #ifdef USE_TEMP_COMPARE_BUF
   void *tmp_buf = malloc(length);
   memset(tmp_buf, pattern_list[pattern], length);
