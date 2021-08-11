@@ -8,12 +8,12 @@ TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 # in $(pwd) ist eine datei testcase.c , die ausgewertet weeden soll
 
 # without tool
-/usr/bin/time --format "%e,%M" -o time_compile_baseline mpicc -g testcase.c -lm
+/usr/bin/time --format "%e,%M" -o time_compile_baseline mpicc -g -fopenmp testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run_baseline $TIMEOUT_CMD mpirun -n 2 ./a.out
 
 # with tool
-/usr/bin/time --format "%e,%M" -o time_compile mpicc -g testcase.c -lm
+/usr/bin/time --format "%e,%M" -o time_compile mpicc -g -fopenmp testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun -n 2 ./a.out
 
