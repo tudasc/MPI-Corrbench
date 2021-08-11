@@ -15,7 +15,7 @@ jobs:
       - name: Check code formatting
         run: |
               cd $MPI_CORRECTNESS_BM_DIR/micro-benches && \
-              export CPATH=$CPATH:./0-level/correct/include && \
+              export CPATH=$CPATH:./0-level/correct/include:./0-level/openmp && \
               for i in $(find . -type f -name "*.c"); \
                 do echo Check code Format for $i ; \
                 clang-format -style=file --dry-run --Werror $i;\
@@ -34,7 +34,7 @@ jobs:
       - name: Check compilation
         run: |
               cd $MPI_CORRECTNESS_BM_DIR/micro-benches && \
-              export CPATH=$CPATH:./0-level/correct/include && \
+              export CPATH=$CPATH:./0-level/correct/include:./0-level/openmp && \
               for i in $(find . -type f -name "*.c"); \
                 do echo Compiling $i ; \
                 mpicc $i -Wall -pedantic -Wno-unused-variable -Wno-unused-but-set-variable -fopenmp -lm;\
