@@ -15,7 +15,8 @@ ERR = 6
 case_id = 7
 full_case_name = 8
 
-categories = ['pt2pt', 'coll', 'usertypes', 'rma']
+#categories = ['pt2pt', 'coll', 'usertypes', 'rma']
+categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp']
 
 # compile #'time, 'baseline_time','mem','baseline_mem' run#'time, 'baseline_time','mem','baseline_mem'
 time_compile = 0
