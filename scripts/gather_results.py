@@ -36,6 +36,8 @@ def add_cases(score, case):
     score[4] += case[4]
     score[5] += case[5]
     score[6] += case[6]
+    score[7] += case[7]
+    score[8] += case[8]
     assert score[case_id] == case[case_id]
     assert score[full_case_name] == case[full_case_name]
 
