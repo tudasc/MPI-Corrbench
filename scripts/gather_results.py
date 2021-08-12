@@ -3,8 +3,13 @@ import argparse
 import importlib.util
 import json
 
-## entry: name: [TP,TN,FP,FN,ERR,case_id,full_case_name]
-# True Positive, True Negative, False Positive, False negative, ERR=error in parsing the output or runnung case, case_id for later analysis refers to the dir_name
+## entry: name: [TP,TN,FP,FN,ERR,error_present,user_expectation_met,case_id,full_case_name]
+# True Positive, True Negative, False Positive, False negative,
+# ERR=error in parsing the output or runnung case,
+# error_present: if the error actually manifested during execution,
+# user_expectation_met: if the user_expactation_met Flag was set ture by the testcase,
+# case_id, full_case_name for later more in depth analysis refers to the dir_name
+
 TP = 0
 TN = 1
 FP = 2
@@ -12,8 +17,11 @@ FN = 3
 TW = 4
 FW = 5
 ERR = 6
-case_id = 7
-full_case_name = 8
+error_present = 7
+user_expectation_met = 8
+case_id = 9
+full_case_name = 10
+
 
 # read env vars
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
