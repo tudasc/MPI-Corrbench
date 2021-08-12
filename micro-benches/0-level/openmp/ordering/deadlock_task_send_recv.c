@@ -6,7 +6,7 @@
 #define BUFFER_LENGTH_INT 8
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
-#define NUM_THREADS 2
+#define NUM_THREADS 1
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -29,20 +29,20 @@ int main(int argc, char *argv[]) {
   fill_message_buffer(recv_data, BUFFER_LENGTH_BYTE, 3);
   fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6);
 
-#pragma omp parallel num_threads(NUM_THREADS)
+#pragma omp parallel num_threads(NUM_THREADS)  // (may) deadlock with one thread
   {
 #pragma omp single
     {
 #pragma omp task
       {
+        //        printf("T_A_[%i] ", rank);
+        MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      }
+#pragma omp task
+      {
         //        printf("T_B_[%i] ", rank);
         MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD);
       }
-    }
-#pragma omp task
-    {
-      //      printf("T_A_[%i] ", rank);
-      MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
   }
 
