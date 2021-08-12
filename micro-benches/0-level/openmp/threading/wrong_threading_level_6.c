@@ -1,3 +1,4 @@
+#include "nondeterminism.h"
 #include <mpi.h>
 #include <omp.h>
 #include <stddef.h>

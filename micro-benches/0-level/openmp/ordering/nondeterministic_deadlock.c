@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Init_thread(&argc, &argv, requested, &provided);
   if (provided < requested) {
+    has_error_manifested(false);
     exit(EXIT_FAILURE);
   }
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);

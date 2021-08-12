@@ -1,3 +1,4 @@
+#include "nondeterminism.h"
 #include <mpi.h>
 #include <omp.h>
 #include <stddef.h>
@@ -17,6 +18,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Init_thread(&argc, &argv, requested, &provided);
   if (provided < requested) {
+    has_error_manifested(false);
     exit(EXIT_FAILURE);
   }
 
