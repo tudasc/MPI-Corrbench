@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Irecv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req);
 
-#pragma omp parallel default(none) shared(send_data, size, rank) num_threads(NUM_THREADS)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
     send_data[omp_get_thread_num()] = -1;
     // #pragma omp barrier -- this fixes the data race error

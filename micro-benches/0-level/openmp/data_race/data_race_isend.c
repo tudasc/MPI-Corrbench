@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Irecv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req);
 
-#pragma omp parallel default(none) shared(send_data, size, rank, req_master) num_threads(NUM_THREADS)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp master
     { MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master); }
