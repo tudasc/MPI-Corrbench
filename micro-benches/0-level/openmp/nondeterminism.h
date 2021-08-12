@@ -25,9 +25,9 @@ static inline void has_error_manifested(bool manifested) {
 }
 
 // Tell Corrbench if the user expectation was met
-static inline void was_user_expectation_met(bool manifested) {
-  // else do nothing: we assume that an error was present unless signaled otherwise
-  if (!manifested) {
+static inline void was_user_expectation_met(bool expectation_met) {
+  // else do nothing: we assume that the test failed otherwise
+  if (expectation_met) {
     // just create the signal file
     FILE *file_ptr = fopen(SIGNAL_FILE_NAME_USER_EXPECTATION, "w");
     fclose(file_ptr);
