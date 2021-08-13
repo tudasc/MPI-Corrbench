@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     }
 //#pragma omp barrier // fixes the data race
 #pragma omp single
-    MPI_Reduce(local_data, reduced_data, BUFFER_LENGTH_INT, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    { MPI_Reduce(local_data, reduced_data, BUFFER_LENGTH_INT, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); }
   }
 
   if (rank == 0) {
