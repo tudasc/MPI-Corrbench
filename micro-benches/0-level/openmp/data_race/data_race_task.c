@@ -4,7 +4,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-// DRB136
+// This test is loosely based on test DRB136 of the data race bench.
+// See https://github.com/LLNL/dataracebench
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;

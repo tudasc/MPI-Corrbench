@@ -19,6 +19,8 @@ bool has_error(const int *buffer, int expected) {
   return false;
 }
 
+// This test is loosely based on test DRB013 of the data race bench.
+// See https://github.com/LLNL/dataracebench
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_SERIALIZED;

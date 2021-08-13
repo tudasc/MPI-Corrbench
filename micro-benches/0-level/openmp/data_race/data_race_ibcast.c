@@ -19,6 +19,8 @@ bool has_error(const int *buffer) {
   return false;
 }
 
+// This test is loosely based on a unit test of the MUST correctness checker.
+// See https://itc.rwth-aachen.de/must/
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;
