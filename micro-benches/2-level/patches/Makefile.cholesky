@@ -1,0 +1,26 @@
+TARGET=clang
+CC ?= OMPI_CC=clang mpicc
+CXX ?= OMPI_CXX=clang++ mpic++
+MPICXX ?= $(CXX)
+MKLROOT ?= /shared/apps/intel/2020.4/mkl
+CFLAGS  += -I$(MKLROOT)/include -O3 -I./ -std=gnu99  -fopenmp -g -fopenmp-version=50
+LDFLAGS += -fopenmp -fopenmp-version=50 -L$(MKLROOT)/lib/intel64 -Wl,--rpath,$(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread -lm -ldl
+
+
+SRC=ch_ompss.c ch_common.c
+OBJECTS = $(SRC:.c=.o)
+
+
+all : cholesky_$(TARGET)_fine
+
+.c.o: $(SRC)
+	$(CC) $(CFLAGS) -c $< -o $@ 
+
+cholesky_$(TARGET)_fine: $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+
+clean:
+	rm -f *.o cholesky_$(TARGET)_fine *.so
+
+cleanall: 
+	rm -f *.o cholesky_*_fine *.so
