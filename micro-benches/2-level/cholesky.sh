@@ -14,15 +14,15 @@ cholesky_patch_file=${CORRBENCH_mutate_file}
 
 if [[ ${do_download} == "yes" ]]; then
   echo "Download ${target_name}"
-  https://github.com/RWTH-HPC/${target_name}.git
+  git clone -b mpi-detach https://github.com/RWTH-HPC/${target_name}.git
 fi
 
 if [[ ${do_build} == "yes" ]]; then
-	echo "Building application"
-	cd ${cholesky_dir}
-	cp ../../patches/Makefile.cholesky ./Makefile
+  echo "Building application"
+  cd ${cholesky_dir}
+  cp ../../patches/Makefile.cholesky ./Makefile
 
-	# apply patches and build the mutations
+  # apply patches and build the mutations
   if [[ -n "${cholesky_patch_file}" ]]; then
     # Init git repo, add everything apply patch
     echo -e "Applying the patch file: " ${cholesky_patch_file}
@@ -36,14 +36,15 @@ if [[ ${do_build} == "yes" ]]; then
 fi
 
 if [[ "${do_run}" == "yes" ]]; then
-	echo "Running application"
-	cd ${cholesky_dir}
-    time ${mpi_run} -np ${mpi_procs} ./ch_clang_fine 1024 128 1
-	cd ../..
+  echo "Running application"
+  cd ${cholesky_dir}
+  export MPIX_DETACH=progress
+  time ${mpi_run} -np ${mpi_procs} ./cholesky_clang_fine 4096 128 1
+  cd ../..
 fi
 
 if [[ "${do_clean}" == "yes" ]]; then
-	echo "Removing directory ${cholesky_dir}"
-	#rm -rf ${cholesky_dir} 
+  echo "Removing directory ${target_name}"
+  rm -rf ${target_name}
 fi
 
