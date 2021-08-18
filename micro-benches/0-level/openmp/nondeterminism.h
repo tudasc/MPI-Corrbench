@@ -3,7 +3,6 @@
 
 #define USE_TEMP_COMPARE_BUF
 #define SIGNAL_FILE_NAME_ERROR "error_not_present"
-#define SIGNAL_FILE_NAME_USER_EXPECTATION "expectation_met"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -20,16 +19,6 @@ static inline void has_error_manifested(bool manifested) {
   if (!manifested) {
     // just create the signal file
     FILE *file_ptr = fopen(SIGNAL_FILE_NAME_ERROR, "w");
-    fclose(file_ptr);
-  }
-}
-
-// Tell Corrbench if the user expectation was met
-static inline void was_user_expectation_met(bool expectation_met) {
-  // else do nothing: we assume that the test failed otherwise
-  if (expectation_met) {
-    // just create the signal file
-    FILE *file_ptr = fopen(SIGNAL_FILE_NAME_USER_EXPECTATION, "w");
     fclose(file_ptr);
   }
 }
