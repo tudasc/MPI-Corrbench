@@ -14,11 +14,10 @@ import json
 # correct_error_found wether or not exactely the expected error was found
 # -1 means could not tell (e.g. output is missing or not helpful or error specification missing) 0 means false, 1 true
 
-## entry: name: [TP,TN,FP,FN,ERR,error_present,user_expectation_met,case_id,full_case_name]
+## entry: name: [TP,TN,FP,FN,ERR,error_present,case_id,full_case_name]
 # True Positive, True Negative, False Positive, False negative,
 # ERR=error in parsing the output or runnung case,
 # error_present: if the error actually manifested during execution,
-# user_expectation_met: if the user_expactation_met Flag was set ture by the testcase,
 # case_id, full_case_name for later more in depth analysis refers to the dir_name
 
 TP = 0
@@ -29,9 +28,8 @@ TW = 4
 FW = 5
 ERR = 6
 error_present = 7
-user_expectation_met = 8
-case_id = 9
-full_case_name = 10
+case_id = 8
+full_case_name = 9
 
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
 
@@ -92,12 +90,8 @@ def main():
         if os.path.exists(test_dir.path + "/error_not_present"):
             local_error_manifested = 0
 
-        local_user_expectation_met =0
-        if os.path.exists(test_dir.path + "/expectation_met"):
-            local_user_expectation_met = 1
-
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
-        data = [0, 0, 0, 0,0,0, 0,local_error_manifested,local_user_expectation_met, case_id,full_case]
+        data = [0, 0, 0, 0,0,0, 0,local_error_manifested,case_id,full_case]
 
         ## -1 = error processing case
         if error_found == -1:

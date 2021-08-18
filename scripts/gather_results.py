@@ -3,11 +3,10 @@ import argparse
 import importlib.util
 import json
 
-## entry: name: [TP,TN,FP,FN,ERR,error_present,user_expectation_met,case_id,full_case_name]
+## entry: name: [TP,TN,FP,FN,ERR,error_present,case_id,full_case_name]
 # True Positive, True Negative, False Positive, False negative,
 # ERR=error in parsing the output or runnung case,
 # error_present: if the error actually manifested during execution,
-# user_expectation_met: if the user_expactation_met Flag was set ture by the testcase,
 # case_id, full_case_name for later more in depth analysis refers to the dir_name
 
 TP = 0
@@ -18,9 +17,8 @@ TW = 4
 FW = 5
 ERR = 6
 error_present = 7
-user_expectation_met = 8
-case_id = 9
-full_case_name = 10
+case_id = 8
+full_case_name = 9
 
 
 # read env vars
@@ -37,7 +35,6 @@ def add_cases(score, case):
     score[5] += case[5]
     score[6] += case[6]
     score[7] += case[7]
-    score[8] += case[8]
     assert score[case_id] == case[case_id]
     assert score[full_case_name] == case[full_case_name]
 
