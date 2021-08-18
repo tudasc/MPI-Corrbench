@@ -31,7 +31,7 @@ if [[ ${do_build} == "yes" ]]; then
     echo "Applying no mutation"
   fi
 
-  make MPICXX="${mpi_cxx}" ${make_target} -j ${n_procs}
+  make MPICXX="${mpi_cxx}" MPICC="${mpi_cc}" ${make_target} -j ${n_procs}
   cd ../../..
 fi
 
