@@ -48,5 +48,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Finalize();
 
+  has_error_manifested(false);
+
   return 0;
 }
