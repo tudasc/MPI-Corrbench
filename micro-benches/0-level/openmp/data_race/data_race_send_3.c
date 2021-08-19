@@ -50,27 +50,27 @@ int main(int argc, char *argv[]) {
   //  }
   //  printf("\n");
 
-#pragma omp parallel num_threads(NUM_THREADS) // likely race with >= 3 threads
-{
-  send_data[omp_get_thread_num()] = -1;
+#pragma omp parallel num_threads(NUM_THREADS)  // likely race with >= 3 threads
+  {
+    send_data[omp_get_thread_num()] = -1;
 
 #pragma omp single nowait
-{ MPI_Barrier(MPI_COMM_WORLD); } // nowait allows other thread to reach MPI_Send, while Barrier is executed
+    { MPI_Barrier(MPI_COMM_WORLD); }  // nowait allows other thread to reach MPI_Send, while Barrier is executed
 #pragma omp single
-{ MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }
-}
+    { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }
+  }
 
-MPI_Wait(&req, MPI_STATUS_IGNORE);
+  MPI_Wait(&req, MPI_STATUS_IGNORE);
 
   const bool error = has_error(recv_data);
   has_error_manifested(error);
-//  if (error) {
-//    printf("Has the error.\n");
-//    for (int i = 0; i < NUM_THREADS; ++i) {
-//      printf("%i, ", recv_data[i]);
-//    }
-//    printf("\n");
-//  }
+  //  if (error) {
+  //    printf("Has the error.\n");
+  //    for (int i = 0; i < NUM_THREADS; ++i) {
+  //      printf("%i, ", recv_data[i]);
+  //    }
+  //    printf("\n");
+  //  }
 
   MPI_Finalize();
 

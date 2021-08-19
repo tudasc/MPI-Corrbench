@@ -10,9 +10,9 @@
 
 #define NUM_THREADS 2
 
-bool has_error(int* buffer){
+bool has_error(int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
-    if(buffer[i] != i){
+    if (buffer[i] != i) {
       return true;
     }
   }
@@ -37,23 +37,22 @@ int main(int argc, char *argv[]) {
   int recv_data[BUFFER_LENGTH_INT];
   int send_data[BUFFER_LENGTH_INT];
 
-
   fill_message_buffer(recv_data, BUFFER_LENGTH_BYTE, 6);
   fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 1);
 
 #pragma omp parallel num_threads(NUM_THREADS)
-{
-  const int thread_num = omp_get_thread_num();
-  send_data[thread_num] = thread_num;
+  {
+    const int thread_num = omp_get_thread_num();
+    send_data[thread_num] = thread_num;
 
 #pragma omp barrier
-  if(rank == 0) {
-    MPI_Send(&send_data[thread_num], 1, MPI_INT, size - rank - 1, thread_num, MPI_COMM_WORLD);
-  } else if(rank == 1) {
-    // Any tag leads to "random" ordering
-    MPI_Recv(&recv_data[thread_num], 1, MPI_INT, size - rank - 1, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    if (rank == 0) {
+      MPI_Send(&send_data[thread_num], 1, MPI_INT, size - rank - 1, thread_num, MPI_COMM_WORLD);
+    } else if (rank == 1) {
+      // Any tag leads to "random" ordering
+      MPI_Recv(&recv_data[thread_num], 1, MPI_INT, size - rank - 1, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
   }
-}
 
   const bool error = has_error(recv_data);
   has_error_manifested(error);
