@@ -15,6 +15,12 @@
  * Hybrid Programming Models. In: Keller R., Gabriel E., Resch M., Dongarra J. (eds) Recent Advances in the Message
  * Passing Interface. EuroMPI 2010. Lecture Notes in Computer Science, vol 6305. Springer, Berlin, Heidelberg.
  * https://doi.org/10.1007/978-3-642-15646-5_6.
+ *
+ * Matrix here: (0, 1) (0, 2)
+ * (source, tag) -> aquire/release
+ * (0, 2) -> (lock) tag entry 2
+ * (0, *) -> (lock all [tag] entries of 0 - 1 + 2)
+ *
  */
 
 int main(int argc, char *argv[]) {
@@ -63,9 +69,9 @@ int main(int argc, char *argv[]) {
           int *local_buffer = malloc(sizeof(int) * local_size);
 
           MPI_Recv(local_buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          omp_unset_lock(&lock);
 
           free(local_buffer);
-          omp_unset_lock(&lock);
         }
 #pragma omp section
         {
@@ -79,11 +85,11 @@ int main(int argc, char *argv[]) {
           int *local_buffer = malloc(sizeof(int) * local_size);
 
           MPI_Recv(local_buffer, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          omp_unset_lock(&lock);
 
           MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, 0, 1, MPI_COMM_WORLD);
 
           free(local_buffer);
-          omp_unset_lock(&lock);
         }
       }
     }

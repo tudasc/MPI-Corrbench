@@ -52,9 +52,13 @@ int main(int argc, char *argv[]) {
       int *value = (int *)malloc(sizeof(int) * count);
       MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-      has_race = (count == 1 && value[0] != -1) || (count == 2 && value[0] != -2);
+      const bool thread_race = (count == 1 && value[0] != -1) || (count == 2 && value[0] != -2);
 
-      printf("Status race %i: %i %i\n", has_race, count, value[0]);
+#pragma omp critical
+      has_race = has_race || thread_race;
+
+      //#pragma omp critical
+      //      printf("Status race %i: %i %i\n", has_race, count, value[0]);
       // sometimes:
       //      Status race 0: 2 -2
       //      Status race 0: 1 -1
@@ -68,7 +72,10 @@ int main(int argc, char *argv[]) {
 
   MPI_Finalize();
 
-  has_error_manifested(has_race);
-
+  if (rank == 1) {
+    has_error_manifested(has_race);
+    if (has_race)
+      printf("Has race\n");
+  }
   return 0;
 }

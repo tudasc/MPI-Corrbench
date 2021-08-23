@@ -8,8 +8,6 @@
 
 #define NUM_THREADS 2
 
-// From: Fixing Probe for Multi-Threaded MPI Applications Fixing Probe for Multi-Threaded MPI Applications
-// (Revision 4): http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.568.6739
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -25,16 +23,35 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  if (rank == 0) {
-    int value = -1;
-    MPI_Send(&value, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
-  } else if (rank == 1) {
 #pragma omp parallel num_threads(NUM_THREADS)
-    {
+  {
+    if (rank == 0) {
+#pragma omp sections
+      {
+#pragma omp section
+        {
+          int value[2] = {-1, -1};
+          MPI_Send(&value, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
+        }
+#pragma omp section
+        {
+          int value = -2;
+          MPI_Send(&value, 1, MPI_INT, 1, 1, MPI_COMM_WORLD);
+        }
+      }
+
+    } else if (rank == 1) {
+      // Deadlocks often (not always)
       MPI_Status status;
-      int value;
-      MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-      MPI_Recv(&value, 1, MPI_INT, status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+      int count;
+      MPI_Get_count(&status, MPI_INT, &count);
+
+      int *value = (int *)malloc(sizeof(int) * count);
+      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+      free(value);
     }
   }
 

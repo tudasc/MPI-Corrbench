@@ -26,12 +26,6 @@ int main(int argc, char *argv[]) {
   int c = 3;
   int d = 0;
 
-  MPI_Comm other_comm_world;
-  MPI_Comm_split(MPI_COMM_WORLD, 0, rank, &other_comm_world);
-
-  MPI_Comm final_comm_world;
-  MPI_Comm_split(MPI_COMM_WORLD, 0, rank, &final_comm_world);
-
 #pragma omp parallel
 #pragma omp single
   {
@@ -44,11 +38,11 @@ int main(int argc, char *argv[]) {
 #pragma omp task depend(in : b)  // depend(inout : c)
     {
       int reduced_b = 0;
-      MPI_Reduce(&b, &reduced_b, 1, MPI_INT, MPI_SUM, 0, other_comm_world);
+      MPI_Reduce(&b, &reduced_b, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
       c += reduced_b;
     }
 #pragma omp task depend(in : c) depend(out : d)
-    { MPI_Reduce(&c, &d, 1, MPI_INT, MPI_SUM, 0, final_comm_world); }
+    { MPI_Reduce(&c, &d, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); }
   }
 
   if (rank == 0) {
@@ -57,9 +51,6 @@ int main(int argc, char *argv[]) {
     if (error)
       printf("Error %i\n", d);
   }
-
-  MPI_Comm_free(&other_comm_world);
-  MPI_Comm_free(&final_comm_world);
 
   MPI_Finalize();
 
