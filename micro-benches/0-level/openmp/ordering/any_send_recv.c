@@ -10,7 +10,7 @@
 
 #define NUM_THREADS 2
 
-bool has_error(int *buffer) {
+bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
     if (buffer[i] != i) {
       return true;
