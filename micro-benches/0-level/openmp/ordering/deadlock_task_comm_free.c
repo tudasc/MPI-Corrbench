@@ -1,14 +1,16 @@
 #include "nondeterminism.h"
 
 #include <mpi.h>
-#include <omp.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
 #define BUFFER_LENGTH_INT 10000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
-#define NUM_THREADS 8
+#define NUM_THREADS 2
+
+// Data race on other_comm_world communicator (overlapping communication and comm_free)
+// Three outcomes: Succeeds, deadlocks, MPI runtime crashes
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -44,16 +46,17 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
-#pragma omp single nowait
-    {
-      MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1,
-                   other_comm_world, MPI_STATUS_IGNORE);
-    }
-
 #pragma omp single
-    { MPI_Comm_free(&other_comm_world); }
+    {
+#pragma omp task
+      {
+        MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank,
+                     1, other_comm_world, MPI_STATUS_IGNORE);
+      }
+#pragma omp task
+      { MPI_Comm_free(&other_comm_world); }
+    }
   }
-
   MPI_Finalize();
 
   has_error_manifested(false);
