@@ -35,12 +35,10 @@ int main(int argc, char *argv[]) {
     {
 #pragma omp task
       {
-        //        printf("T_A_[%i] ", rank);
         MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       }
 #pragma omp task
       {
-        //        printf("T_B_[%i] ", rank);
         MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD);
       }
     }

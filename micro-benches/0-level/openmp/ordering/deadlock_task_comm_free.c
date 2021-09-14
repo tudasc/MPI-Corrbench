@@ -41,7 +41,6 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(other_comm_world, &split_size);
   MPI_Comm_rank(other_comm_world, &split_rank);
 
-  //  const int from = split_size - split_rank - 1;
   const int to_rank = (split_rank == 0) ? 1 : 0;
 
 #pragma omp parallel num_threads(NUM_THREADS)

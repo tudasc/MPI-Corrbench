@@ -9,15 +9,6 @@
 
 #define NUM_THREADS 2
 
-bool has_error(const int *buffer) {
-  for (int i = 0; i < NUM_THREADS; ++i) {
-    if (buffer[i] != -1) {
-      return true;
-    }
-  }
-  return false;
-}
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -69,16 +60,8 @@ int main(int argc, char *argv[]) {
   if (rank == 1) {
     has_race = !has_buffer_expected_content(recv_data, BUFFER_LENGTH_BYTE, 1) &&
                !has_buffer_expected_content(recv_data, BUFFER_LENGTH_BYTE, 2);
-
-    //    if (has_race) {
-    //      printf("Error p1\n");
-    //    }
   } else if (rank == 0) {
     has_race = !has_buffer_expected_content(send_data, BUFFER_LENGTH_BYTE, 2);
-
-    //    if (has_race) {
-    //      printf("Error p0\n");
-    //    }
   }
 
   int has_error_m = 0;

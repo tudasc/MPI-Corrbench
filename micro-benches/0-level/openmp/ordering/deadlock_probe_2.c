@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
       int *value = (int *)malloc(sizeof(int) * count);
       MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-      const bool thread_race = (count == 1 && value[0] != -2) || (count == 2 && value[0] != -1);
+      //      const bool thread_race = (count == 1 && value[0] != -2) || (count == 2 && value[0] != -1);
 
       free(value);
     }

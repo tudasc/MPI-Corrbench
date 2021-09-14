@@ -45,11 +45,6 @@ int main(int argc, char *argv[]) {
 
   MPI_Irecv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req);
 
-  //  for (int i = 0; i < NUM_THREADS; ++i) {
-  //    printf("%i, ", recv_data[i]);
-  //  }
-  //  printf("\n");
-
 #pragma omp parallel num_threads(NUM_THREADS)
   {
     send_data[omp_get_thread_num()] = -1;
@@ -62,13 +57,6 @@ int main(int argc, char *argv[]) {
 
   const bool error = has_error(recv_data);
   has_error_manifested(error);
-  //  if (error) {
-  //    printf("Has the error.\n");
-  //    for (int i = 0; i < NUM_THREADS; ++i) {
-  //      printf("%i, ", recv_data[i]);
-  //    }
-  //    printf("\n");
-  //  }
 
   MPI_Finalize();
 

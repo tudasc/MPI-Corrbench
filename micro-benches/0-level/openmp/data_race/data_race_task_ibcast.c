@@ -50,9 +50,6 @@ int main(int argc, char *argv[]) {
 
   const bool error = !has_buffer_expected_content(send_data, BUFFER_LENGTH_BYTE, 6);
   has_error_manifested(error);
-  //  if (error) {
-  //    printf("Has error\n");
-  //  }
 
   MPI_Finalize();
 

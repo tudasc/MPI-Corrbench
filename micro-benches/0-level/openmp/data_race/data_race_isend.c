@@ -57,13 +57,6 @@ int main(int argc, char *argv[]) {
 
   const bool error = has_error(recv_data);
   has_error_manifested(error);
-  //  if (error) {
-  //    printf("Has the error.\n");
-  //    for (int i = 0; i < NUM_THREADS; ++i) {
-  //      printf("%i, ", recv_data[i]);
-  //    }
-  //    printf("\n");
-  //  }
 
   MPI_Finalize();
 

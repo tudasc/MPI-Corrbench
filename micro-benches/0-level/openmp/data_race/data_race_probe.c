@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
       const bool thread_race = (count == 1 && value[0] != -1) || (count == 2 && value[0] != -2);
 
 #pragma omp critical
-      has_race = has_race || thread_race;
+      has_race = (has_race || thread_race);
 
       //#pragma omp critical
       //      printf("Status race %i: %i %i\n", has_race, count, value[0]);
