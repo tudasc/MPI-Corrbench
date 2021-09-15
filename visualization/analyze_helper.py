@@ -21,7 +21,7 @@ case_id = 8
 full_case_name = 9
 
 #categories = ['pt2pt', 'coll', 'usertypes', 'rma']
-categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp']
+categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp/data_race','openmp/ordering','openmp/threading']
 
 # compile #'time, 'baseline_time','mem','baseline_mem' run#'time, 'baseline_time','mem','baseline_mem'
 time_compile = 0
