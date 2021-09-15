@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #ifdef USE_TEMP_COMPARE_BUF
 #include <stdlib.h>
@@ -27,7 +28,7 @@ static inline void has_error_manifested(bool manifested) {
 // this way we can find "wrong" message matching
 // sender and receiver need to use the same pattern_id
 
-const char pattern_list[8] = {0x0F, 0xF0, 0xAA, 0x55, 0x99, 0xCC, 0x00, 0xFF};
+const unsigned char pattern_list[8] = {0x0F, 0xF0, 0xAA, 0x55, 0x99, 0xCC, 0x00, 0xFF};
 
 static inline void fill_message_buffer(void *buf, size_t length, int pattern) {
   memset(buf, pattern_list[pattern], length);
@@ -50,6 +51,16 @@ static inline bool has_buffer_expected_content(void *buf, size_t length, int pat
   return true;
 
 #endif
+}
+
+static inline void us_sleep(long int microseconds) {
+  const long int scale2sec = (long int)1e6;
+  const long int scale2nsec = 1000;
+  const long int tv_sec = microseconds / scale2sec;
+  const long int tv_nano = (microseconds % scale2sec) * scale2nsec;
+
+  struct timespec ts = {tv_sec, tv_nano};
+  nanosleep(&ts, NULL);
 }
 
 #endif
