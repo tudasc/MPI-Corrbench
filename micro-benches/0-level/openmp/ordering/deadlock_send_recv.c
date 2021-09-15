@@ -8,6 +8,8 @@
 
 #define NUM_THREADS 2
 
+// Deadlocks, as deadlocking operations are inside of an openmp master region
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;

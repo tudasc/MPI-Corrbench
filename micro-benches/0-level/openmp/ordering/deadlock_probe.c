@@ -22,6 +22,7 @@
  * (0, *) -> (lock all [tag] entries of 0 - 1 + 2)
  *
  */
+//--> if message with tag 2 will get caught in section B, the other probe will never match
 
 int main(int argc, char *argv[]) {
   int provided;

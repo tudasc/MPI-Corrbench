@@ -9,6 +9,9 @@
 
 #define NUM_THREADS 2
 
+// A Data-Race can occur, as the same buffer is used in sending (A) and receive (B)
+// not an error according tho the MPI standard, but something where the user introduces a data race
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -41,9 +44,9 @@ int main(int argc, char *argv[]) {
 #pragma omp sections
       {
 #pragma omp section
-        { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD); }
+        { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD); }  // A
 #pragma omp section
-        { MPI_Recv(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); }
+        { MPI_Recv(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); }  // B
       }
 
     } else if (rank == 1) {

@@ -8,6 +8,8 @@
 
 #define NUM_THREADS 1
 
+// This Program MAY deadlock with one thread (depending on the OpenMP implkementation)
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -34,13 +36,9 @@ int main(int argc, char *argv[]) {
 #pragma omp single
     {
 #pragma omp task
-      {
-        MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      }
+      { MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE); }
 #pragma omp task
-      {
-        MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD);
-      }
+      { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }
     }
   }
 

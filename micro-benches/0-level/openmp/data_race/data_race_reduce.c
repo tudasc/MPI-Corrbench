@@ -10,6 +10,8 @@
 
 #define NUM_THREADS 2
 
+// Data Race may occur between computing the msg buffer (location A) and the reduce call (location B)
+
 bool has_error(const int *buffer, int expected) {
   for (int i = 0; i < BUFFER_LENGTH_INT; ++i) {
     if (buffer[i] != expected) {
@@ -47,11 +49,11 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp for nowait
     for (int i = 0; i < BUFFER_LENGTH_INT; i++) {
-      local_data[i] = local_data[i] + value;
+      local_data[i] = local_data[i] + value; ((A
     }
 //#pragma omp barrier // fixes the data race
 #pragma omp single
-    { MPI_Reduce(local_data, reduced_data, BUFFER_LENGTH_INT, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); }
+    { MPI_Reduce(local_data, reduced_data, BUFFER_LENGTH_INT, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); }  // B
   }
 
   if (rank == 0) {

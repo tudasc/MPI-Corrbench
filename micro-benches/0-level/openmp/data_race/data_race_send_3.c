@@ -10,6 +10,8 @@
 
 #define NUM_THREADS 3
 
+// Data Race may occur between computing the msg buffer (location A) and the send operation (location B)
+
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
     if (buffer[i] != -1) {
@@ -47,12 +49,12 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)  // likely race with >= 3 threads
   {
-    send_data[omp_get_thread_num()] = -1;
+    send_data[omp_get_thread_num()] = -1;  // A
 
 #pragma omp single nowait
     { MPI_Barrier(MPI_COMM_WORLD); }  // nowait allows other thread to reach MPI_Send, while Barrier is executed
 #pragma omp single
-    { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }
+    { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }  // B
   }
 
   MPI_Wait(&req, MPI_STATUS_IGNORE);

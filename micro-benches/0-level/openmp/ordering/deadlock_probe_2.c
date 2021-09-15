@@ -8,6 +8,9 @@
 
 #define NUM_THREADS 2
 
+// deadlock occurs, if the probe (A) matches to the same message on both threads meaning that one thread will wait
+// infinitly for the message to arrive (at B)
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -43,13 +46,13 @@ int main(int argc, char *argv[]) {
     } else if (rank == 1) {
       // Deadlocks often (not always)
       MPI_Status status;
-      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);  // A
 
       int count;
       MPI_Get_count(&status, MPI_INT, &count);
 
       int *value = (int *)malloc(sizeof(int) * count);
-      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  // B
 
       //      const bool thread_race = (count == 1 && value[0] != -2) || (count == 2 && value[0] != -1);
 

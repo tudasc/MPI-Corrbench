@@ -8,6 +8,8 @@
 
 #define NUM_THREADS 2
 
+// Data Race may occur between computing the msg buffer (location A) and the send operation (location B)
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -36,12 +38,12 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp single
     {
-#pragma omp task  // fix for data race: depend(out : send_data)
-      { fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6); }
-#pragma omp task  // fix for data race: depend(in : send_data)
+#pragma omp task                                                  // fix for data race: depend(out : send_data)
+      { fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6); }  // A
+#pragma omp task                                                  // fix for data race: depend(in : send_data)
       {
         MPI_Request req_task;
-        MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_task);
+        MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_task);  // B
         MPI_Wait(&req_task, MPI_STATUS_IGNORE);
       }
     }

@@ -10,6 +10,8 @@
 
 #define NUM_THREADS 2
 
+// Data Race may occur between computing the msg buffer (location A) and the send operation (location B)
+
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
     if (buffer[i] != -1) {

@@ -9,6 +9,9 @@
 
 #define NUM_THREADS 8
 
+// Using a Freed communicator is not allowed
+// Comm_Free (A) may be executed before the sendrecv (B)
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -46,11 +49,11 @@ int main(int argc, char *argv[]) {
 #pragma omp single nowait
     {
       MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1,
-                   other_comm_world, MPI_STATUS_IGNORE);
+                   other_comm_world, MPI_STATUS_IGNORE);  // B
     }
 
 #pragma omp single
-    { MPI_Comm_free(&other_comm_world); }
+    { MPI_Comm_free(&other_comm_world); }  // A
   }
 
   MPI_Finalize();

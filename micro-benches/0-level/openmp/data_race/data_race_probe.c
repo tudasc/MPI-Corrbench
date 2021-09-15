@@ -8,6 +8,11 @@
 
 #define NUM_THREADS 2
 
+// race between to MPI_Probe calls is possible
+// if One threads porobes for a msg (A) it is possible that another thread probes for this message as well and receives
+// it before the first thread calls the matching send (B) this may lead to insufficient msg buffer allocated in this
+// example
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -44,13 +49,13 @@ int main(int argc, char *argv[]) {
 
     } else if (rank == 1) {
       MPI_Status status;
-      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);  // A
 
       int count;
       MPI_Get_count(&status, MPI_INT, &count);
 
       int *value = (int *)malloc(sizeof(int) * count);
-      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  // B
 
       const bool thread_race = (count == 1 && value[0] != -1) || (count == 2 && value[0] != -2);
 

@@ -8,6 +8,8 @@
 
 #define NUM_THREADS 2
 
+// Data Race may occur between computing the msg buffer (location A) and the bcast operation (location B)
+
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -35,11 +37,11 @@ int main(int argc, char *argv[]) {
       {
 #pragma omp task  // fix for data race: depend(out : send_data)
         {
-          us_sleep(10);  // Data race is very rare otherwise
-          fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6);
+          us_sleep(10);                                           // Data race is very rare otherwise
+          fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6);  // A
         }
 #pragma omp task  // fix for data race: depend(in : send_data)
-        { MPI_Ibcast(send_data, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD, &req_bcast); }
+        { MPI_Ibcast(send_data, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD, &req_bcast); }  // B
       }
     }
   } else {
