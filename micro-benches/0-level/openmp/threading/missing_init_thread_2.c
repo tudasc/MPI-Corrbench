@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-#pragma omp parallel default(none) shared(myRank, buffer_in, buffer_out)
+#pragma omp parallel default(none)
   {
 #pragma omp for
     for (int i = 0; i < 10; i++) {
