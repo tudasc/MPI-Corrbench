@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp for nowait
     for (int i = 0; i < BUFFER_LENGTH_INT; i++) {
-      local_data[i] = local_data[i] + value; //A
+      local_data[i] = local_data[i] + value;  // A
     }
 //#pragma omp barrier // fixes the data race
 #pragma omp single
