@@ -7,8 +7,7 @@
 #include <unistd.h>
 
 /*
- * Only the master thread may call finalize
- * we assume thread 0 is the master thread (but this may be OpenMP implementation dependant)
+ * Only call finalize after all threads have finished MPI
  */
 int main(int argc, char *argv[]) {
   int myRank;
