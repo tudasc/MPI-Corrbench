@@ -37,13 +37,9 @@ int main(int argc, char *argv[]) {
 #pragma omp single
     {
 #pragma omp task  // fix for data race: depend(out : send_data)
-      {
-        fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6);
-      }
+      { fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6); }
 #pragma omp task  // fix for data race: depend(in : send_data)
-      {
-        MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD);
-      }
+      { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }
     }
   }
 

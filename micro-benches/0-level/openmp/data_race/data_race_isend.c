@@ -5,6 +5,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// This test is loosely based on a unit test of the MUST correctness checker.
+// See https://itc.rwth-aachen.de/must/
+//
+// Data race in parallel region: Concurrently, (1) Isend is executed on a buffer
+// (marker "A"), and (2) without any synchronization ("MPI_Wait") the respective buffer
+// is written to  (marker "B"). Only at marker "C" the MPI_Wait is posted.
+// Note: 3 threads needed to make the error occur more frequently.
+
 #define BUFFER_LENGTH_INT 300
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
@@ -47,12 +55,14 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp master
-    { MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master); }
-    // data race fixed by adding in above master section an MPI_WAIT
-    send_data[omp_get_thread_num()] = -1;
+    { MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master); /* A */ }
+
+    // data race fixed by adding in above master section an MPI_WAIT after the Isend
+    send_data[omp_get_thread_num()] = -1; /* B */
   }
 
-  MPI_Wait(&req_master, MPI_STATUS_IGNORE);  // misplaced, causes data race
+  // misplaced, causes data race:
+  MPI_Wait(&req_master, MPI_STATUS_IGNORE); /* C */
   MPI_Wait(&req, MPI_STATUS_IGNORE);
 
   const bool error = has_error(recv_data);

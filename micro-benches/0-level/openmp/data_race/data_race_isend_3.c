@@ -5,6 +5,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// This test is loosely based on a unit test of the MUST correctness checker.
+// See https://itc.rwth-aachen.de/must/
+//
+// Data race in parallel region on MPI_Request object:
+// Concurrently, the same MPI_Request (marker "A") is shared between
+// different threads posting an Isend (marker "B"), and waiting on it at marker "C".
+
 #define NUM_THREADS 2
 
 #define BUFFER_LENGTH_INT 100
@@ -36,7 +43,7 @@ int main(int argc, char *argv[]) {
 
   int recv_data[BUFFER_LENGTH_INT];
   int send_data[BUFFER_LENGTH_INT];
-  MPI_Request req_send;
+  MPI_Request req_send; /* A */
 
   fill_message_buffer(recv_data, BUFFER_LENGTH_BYTE, 6);
   fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 1);
@@ -51,9 +58,9 @@ int main(int argc, char *argv[]) {
 
 #pragma omp barrier
     // req_send is overwritten by multiple threads:
-    MPI_Isend(&send_data[index], 1, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req_send);
+    MPI_Isend(&send_data[index], 1, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req_send); /* B */
 
-    MPI_Wait(&req_send, MPI_STATUS_IGNORE);
+    MPI_Wait(&req_send, MPI_STATUS_IGNORE); /* C */
     MPI_Wait(&req, MPI_STATUS_IGNORE);
   }
 

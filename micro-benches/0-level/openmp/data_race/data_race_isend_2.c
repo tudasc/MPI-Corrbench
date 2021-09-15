@@ -5,6 +5,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// This test is loosely based on a unit test of the MUST correctness checker.
+// See https://itc.rwth-aachen.de/must/
+//
+// Data race in parallel region: Concurrently, (1) buffer is written to
+// (marker "A"), and (b) without any synchronization ("omp barrier") passed to a
+// Isend operation (marker "B").
+
 #define BUFFER_LENGTH_INT 100
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
@@ -19,8 +26,6 @@ bool has_error(const int *buffer) {
   return false;
 }
 
-// This test is loosely based on a unit test of the MUST correctness checker.
-// See https://itc.rwth-aachen.de/must/
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;
@@ -47,12 +52,13 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
-    send_data[omp_get_thread_num()] = -1;
+    send_data[omp_get_thread_num()] = -1; /* A */
+
     // #pragma omp barrier -- this fixes the data race error
 #pragma omp master
     {
       MPI_Request req_master;
-      MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master);
+      MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master); /* B */
       MPI_Wait(&req_master, MPI_STATUS_IGNORE);
     }
   }
