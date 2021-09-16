@@ -3,12 +3,12 @@
 #include <mpi.h>
 #include <stdlib.h>
 
+// Deadlock: Serial deadlocking operations inside an openmp master region (marker "A").
+
 #define BUFFER_LENGTH_INT 2
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 2
-
-// Deadlocks, as deadlocking operations are inside of an openmp master region
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp master
     {
-      MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD);
+      MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE); /* A */
+      MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD);                    /* B */
     }
   }
 

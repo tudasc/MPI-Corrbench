@@ -4,13 +4,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// Using a freed communicator is not allowed:
+// Before a task finishes the sendrecv (marker "A"), a different task may execute comm_free
+// on the communicator (marker "B").
+
 #define BUFFER_LENGTH_INT 10000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 2
-
-// Using a Freed communicator is not allowed
-// Comm_Free (A) may be executed before the sendrecv (B)
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -50,10 +51,10 @@ int main(int argc, char *argv[]) {
 #pragma omp task
       {
         MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank,
-                     1, other_comm_world, MPI_STATUS_IGNORE);  // B
+                     1, other_comm_world, MPI_STATUS_IGNORE); /* A */
       }
 #pragma omp task
-      { MPI_Comm_free(&other_comm_world); }  // A
+      { MPI_Comm_free(&other_comm_world); /* B */ }
     }
   }
   MPI_Finalize();
