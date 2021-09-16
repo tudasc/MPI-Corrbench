@@ -1,7 +1,7 @@
 
 module use /home/tj75qeje/moudles/modulefiles
 module purge
-module load cmake gcc python openmpi llvm librhash libxml2 MUST
+module load cmake gcc python openmpi_mt llvm librhash libxml2 MUST
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
