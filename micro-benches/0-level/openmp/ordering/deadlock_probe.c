@@ -4,11 +4,6 @@
 #include <omp.h>
 #include <stdlib.h>
 
-#define BUFFER_LENGTH_INT 1
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
-#define NUM_THREADS 2
-
 /*
  * Scenario adapted from listing 1.3/1.4:
  * Hoefler T., Bronevetsky G., Barrett B., de Supinski B.R., Lumsdaine A. (2010) Efficient MPI Support for Advanced
@@ -23,6 +18,11 @@
  *
  */
 //--> if message with tag 2 will get caught in section B, the other probe will never match
+
+#define BUFFER_LENGTH_INT 1
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
+#define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {
   int provided;

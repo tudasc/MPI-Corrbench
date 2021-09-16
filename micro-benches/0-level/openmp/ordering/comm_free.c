@@ -4,13 +4,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// Using a freed communicator is not allowed:
+// Before a thread begins the sendrecv (marker "A"), due to the nowait, another thread may execute comm_free
+// on the communicator (marker "B").
+// Free'ing the communicator before the sendrecv started is erroneous.
+
 #define BUFFER_LENGTH_INT 10000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 8
-
-// Using a Freed communicator is not allowed
-// Comm_Free (A) may be executed before the sendrecv (B)
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -41,7 +43,6 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(other_comm_world, &split_size);
   MPI_Comm_rank(other_comm_world, &split_rank);
 
-  //  const int from = split_size - split_rank - 1;
   const int to_rank = (split_rank == 0) ? 1 : 0;
 
 #pragma omp parallel num_threads(NUM_THREADS)
@@ -49,11 +50,11 @@ int main(int argc, char *argv[]) {
 #pragma omp single nowait
     {
       MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1,
-                   other_comm_world, MPI_STATUS_IGNORE);  // B
+                   other_comm_world, MPI_STATUS_IGNORE); /* A */
     }
 
 #pragma omp single
-    { MPI_Comm_free(&other_comm_world); }  // A
+    { MPI_Comm_free(&other_comm_world); /* B */ }
   }
 
   MPI_Finalize();

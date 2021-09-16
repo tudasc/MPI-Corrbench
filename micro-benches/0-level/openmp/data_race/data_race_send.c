@@ -1,13 +1,11 @@
 #include "nondeterminism.h"
+
 #include <mpi.h>
-#include <omp.h>
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 
-/*
- * may lead to a corrupted send operation
- */
+// Data race in parallel region for Process 1 using omp sections:
+// Concurrently, (1) buffer is written to (marker "A"), and (2) passed to a Isend (marker "B")
+// leading to data race on the buffer.
 
 #define BUFFER_LENGTH_INT 100
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
@@ -35,12 +33,9 @@ int main(int argc, char *argv[]) {
 #pragma omp sections
       {
 #pragma omp section
-        { MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD); }
+        { MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD); /* B */ }
 #pragma omp section
-        {
-          // may conflict with the send in line 39
-          fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 3);
-        }
+        { fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 3); /* A */ }
       }
     }  // end parallel
 

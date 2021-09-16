@@ -3,15 +3,16 @@
 #include <mpi.h>
 #include <stdlib.h>
 
+// Data race due to thread-unsafe MPI_Probe use:
+// Process 0 with 2 Threads sense different data with the same envelope.
+// Process 1 uses MPI_Probe (marker "A") to allocate the required receive buffer dynamically.
+// Between Probe ("A"), MPI_Get_count and the posted MPI_Recv (marker "B"), the message may "change",
+// as the other thread may also probe (and receive) the message.
+
 #define BUFFER_LENGTH_INT 2
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 2
-
-// race between to MPI_Probe calls is possible
-// if One threads porobes for a msg (A) it is possible that another thread probes for this message as well and receives
-// it before the first thread calls the matching send (B) this may lead to insufficient msg buffer allocated in this
-// example
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -49,13 +50,13 @@ int main(int argc, char *argv[]) {
 
     } else if (rank == 1) {
       MPI_Status status;
-      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);  // A
+      MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status); /* A */
 
       int count;
       MPI_Get_count(&status, MPI_INT, &count);
 
       int *value = (int *)malloc(sizeof(int) * count);
-      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  // B
+      MPI_Recv(value, count, MPI_INT, 0, status.MPI_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); /* B */
 
       const bool thread_race = (count == 1 && value[0] != -1) || (count == 2 && value[0] != -2);
 
