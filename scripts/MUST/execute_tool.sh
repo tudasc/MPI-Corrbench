@@ -5,7 +5,7 @@ module load cmake gcc python openmpi_mt llvm librhash libxml2 MUST
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
-# in $(pwd) ist eine datei testcase.c , die ausgewertet weeden soll
+# in $(pwd) is a file testcase.c , that should be analyzed
 
 # without tool
 /usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC -g -fopenmp testcase.c -lm
