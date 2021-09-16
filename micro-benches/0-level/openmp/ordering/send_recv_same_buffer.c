@@ -4,13 +4,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// Data race on a buffer: A data-race can occur, as the same buffer is used in sending ( marker "A") and receive (marker
+// "B"). This may not strictly be an error according the MPI standard.
+
 #define BUFFER_LENGTH_INT 200000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 2
-
-// A Data-Race can occur, as the same buffer is used in sending (A) and receive (B)
-// not an error according tho the MPI standard, but something where the user introduces a data race
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
 #pragma omp sections
       {
 #pragma omp section
-        { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD); }  // A
+        { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD); /* A */ }
 #pragma omp section
-        { MPI_Recv(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); }  // B
+        { MPI_Recv(send_data, BUFFER_LENGTH_INT, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); /* B */ }
       }
 
     } else if (rank == 1) {

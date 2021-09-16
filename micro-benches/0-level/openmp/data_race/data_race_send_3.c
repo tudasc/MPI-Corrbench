@@ -5,6 +5,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// This test is loosely based on a unit test of the MUST correctness checker.
+// See https://itc.rwth-aachen.de/must/
+// Data race in parallel region on buffer: Concurrently, (1) buffer is written to
+// (marker "A"), and (b) without any thread-synchronization ("omp barrier") passed to a
+// send operation (marker "B").
+// Note: The MPI_Barrier is not sufficient to protect against the race (marker "C").
+
 #define BUFFER_LENGTH_INT 100
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
@@ -49,12 +56,12 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)  // likely race with >= 3 threads
   {
-    send_data[omp_get_thread_num()] = -1;  // A
+    send_data[omp_get_thread_num()] = -1; /* A */
 
 #pragma omp single nowait
-    { MPI_Barrier(MPI_COMM_WORLD); }  // nowait allows other thread to reach MPI_Send, while Barrier is executed
+    { MPI_Barrier(MPI_COMM_WORLD); /* C */ }  // nowait allows other thread to reach MPI_Send, while Barrier is executed
 #pragma omp single
-    { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); }  // B
+    { MPI_Send(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); /* B */ }
   }
 
   MPI_Wait(&req, MPI_STATUS_IGNORE);

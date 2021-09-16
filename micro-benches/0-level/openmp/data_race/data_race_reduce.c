@@ -1,16 +1,19 @@
 #include "nondeterminism.h"
 
 #include <mpi.h>
-#include <omp.h>
 #include <stdbool.h>
 #include <stdlib.h>
+
+// This test is loosely based on test DRB013 of the data race bench.
+// See https://github.com/LLNL/dataracebench
+//
+// Data race in parallel region due to buffer writes in parallel for loop with nowait clause (marker "A").
+// Hence, the reduce at marker "B" is executed by some thread while other threads may still write to the buffer.
 
 #define BUFFER_LENGTH_INT 100
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 2
-
-// Data Race may occur between computing the msg buffer (location A) and the reduce call (location B)
 
 bool has_error(const int *buffer, int expected) {
   for (int i = 0; i < BUFFER_LENGTH_INT; ++i) {
@@ -21,8 +24,7 @@ bool has_error(const int *buffer, int expected) {
   return false;
 }
 
-// This test is loosely based on test DRB013 of the data race bench.
-// See https://github.com/LLNL/dataracebench
+//
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_SERIALIZED;
@@ -49,11 +51,11 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp for nowait
     for (int i = 0; i < BUFFER_LENGTH_INT; i++) {
-      local_data[i] = local_data[i] + value;  // A
+      local_data[i] = local_data[i] + value; /* A */
     }
 //#pragma omp barrier // fixes the data race
 #pragma omp single
-    { MPI_Reduce(local_data, reduced_data, BUFFER_LENGTH_INT, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); }  // B
+    { MPI_Reduce(local_data, reduced_data, BUFFER_LENGTH_INT, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); /* B */ }
   }
 
   if (rank == 0) {

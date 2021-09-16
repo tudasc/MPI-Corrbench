@@ -2,14 +2,14 @@
 
 #include <mpi.h>
 #include <stdlib.h>
-#include <time.h>
+
+// Data Race on buffer: Concurrently, (omp) task A writes to the buffer (marker "A") and another task executes a
+// bcast operation using the buffer (marker "B").
 
 #define BUFFER_LENGTH_INT 10
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 #define NUM_THREADS 2
-
-// Data Race may occur between computing the msg buffer (location A) and the bcast operation (location B)
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
       {
 #pragma omp task  // fix for data race: depend(out : send_data)
         {
-          us_sleep(10);                                           // Data race is very rare otherwise
-          fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6);  // A
+          us_sleep(10);                                          // Data race is very rare otherwise
+          fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6); /* A */
         }
 #pragma omp task  // fix for data race: depend(in : send_data)
-        { MPI_Bcast(send_data, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD); }  // B
+        { MPI_Bcast(send_data, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD); /* B */ }
       }
     }
   } else {
