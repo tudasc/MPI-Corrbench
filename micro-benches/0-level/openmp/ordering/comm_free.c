@@ -5,8 +5,9 @@
 #include <stdlib.h>
 
 // Using a freed communicator is not allowed:
-// Before a thread finishes the sendrecv (marker "A"), due to the nowait, another thread may execute comm_free
+// Before a thread begins the sendrecv (marker "A"), due to the nowait, another thread may execute comm_free
 // on the communicator (marker "B").
+// Free'ing the communicator before the sendrecv started is erroneous.
 
 #define BUFFER_LENGTH_INT 10000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
