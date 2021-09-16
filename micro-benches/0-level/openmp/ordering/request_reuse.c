@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// Multiple Threads use the same Request Object for non-blocking communication
+
 #define NUM_THREADS 2
 
 #define BUFFER_LENGTH_INT 100
