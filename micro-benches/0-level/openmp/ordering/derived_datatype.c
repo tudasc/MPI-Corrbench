@@ -4,7 +4,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-// Using conflicting MPI calls on MPI_Info:
+// Using conflicting MPI calls for derived datatype:
+// MPI_Send (marker "A") with a derived datatype may happen after MPI_Type_free on the same datatype (marker "B"), which
+// is errorneous.
 
 #define BUFFER_LENGTH_INT 2
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
