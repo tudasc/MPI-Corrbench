@@ -41,9 +41,8 @@ int main(int argc, char *argv[]) {
   int bcast_data[BUFFER_LENGTH_INT];
   fill_message_buffer(bcast_data, BUFFER_LENGTH_BYTE, 6);
 
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
   {
-    DISTURB_THREAD_ORDER
     bcast_data[omp_get_thread_num()] = -1; /* A */
 
 // #pragma omp barrier -- this fixes the data race error

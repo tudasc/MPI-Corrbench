@@ -47,8 +47,6 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
-
-DISTURB_THREAD_ORDER
     const int index = omp_get_thread_num();
     MPI_Request req;
     MPI_Irecv(&recv_data[index], 1, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req);
