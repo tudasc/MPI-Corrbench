@@ -4,6 +4,14 @@
 #define USE_TEMP_COMPARE_BUF
 #define SIGNAL_FILE_NAME_ERROR "error_not_present"
 
+//#define USE_DISTURBED_THREAD_ORDER
+
+#ifdef USE_DISTURBED_THREAD_ORDER
+#define DISTURB_THREAD_ORDER us_sleep(omp_get_thread_num());
+#else
+#define DISTURB_THREAD_ORDER
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +29,7 @@ static inline void has_error_manifested(bool manifested) {
     // just create the signal file
     FILE *file_ptr = fopen(SIGNAL_FILE_NAME_ERROR, "w");
     fclose(file_ptr);
+printf("ERROR_NOT_PRESENT\n");
   }
 }
 

@@ -49,6 +49,8 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
+
+DISTURB_THREAD_ORDER
     send_data[omp_get_thread_num()] = -1; /* A */
 
     // #pragma omp barrier -- this fixes the data race error

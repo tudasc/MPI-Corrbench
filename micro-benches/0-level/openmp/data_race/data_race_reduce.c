@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel
   {
+DISTURB_THREAD_ORDER
 #pragma omp for nowait
     for (int i = 0; i < BUFFER_LENGTH_INT; i++) {
       local_data[i] = local_data[i] + value; /* A */
