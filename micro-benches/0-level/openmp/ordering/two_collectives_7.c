@@ -11,9 +11,7 @@
  * according to the standard (see p303)
  */
 
-#define BUFFER_LENGTH_INT 100
-#define BUFFER_LENGTH_FLOAT 100
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+#define BUFFER_LENGTH_FLOAT BUFFER_LENGTH_INT
 _Static_assert(sizeof(int) == sizeof(float),
                L"Asserts that float and int have the same lenght, so that a missmatch may accidentely occur!");
 

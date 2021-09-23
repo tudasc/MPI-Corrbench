@@ -11,8 +11,6 @@
  * according to the standard (see p303)
  */
 
-#define BUFFER_LENGTH_INT 100
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 int main(int argc, char *argv[]) {
   int myRank, size;
   int provided;

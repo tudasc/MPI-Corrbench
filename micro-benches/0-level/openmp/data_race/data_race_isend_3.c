@@ -14,9 +14,6 @@
 
 #define NUM_THREADS 2
 
-#define BUFFER_LENGTH_INT 100
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
     if (buffer[i] != -1) {

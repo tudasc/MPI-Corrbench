@@ -12,9 +12,6 @@
 // send operation (marker "B").
 // Note: The MPI_Barrier is not sufficient to protect against the race (marker "C").
 
-#define BUFFER_LENGTH_INT 100
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 #define NUM_THREADS 3
 
 // Data Race may occur between computing the msg buffer (location A) and the send operation (location B)
