@@ -7,6 +7,8 @@
 // Concurrently, (1) buffer is written to (marker "A"), and (2) passed to a Isend (marker "B")
 // leading to data race on the buffer.
 
+#define BUFFER_LENGTH_INT 100
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 int main(int argc, char *argv[]) {
   int myRank;
   int provided;

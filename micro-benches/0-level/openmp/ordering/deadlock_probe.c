@@ -19,6 +19,9 @@
  */
 //--> if message with tag 2 will get caught in section B, the other probe will never match
 
+#define BUFFER_LENGTH_INT 1
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

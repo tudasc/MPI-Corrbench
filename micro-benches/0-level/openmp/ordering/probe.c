@@ -9,6 +9,9 @@
 // Between Probe ("A"), MPI_Get_count and the posted MPI_Recv (marker "B"), the message may "change",
 // as the other thread may also probe (and receive) the message.
 
+#define BUFFER_LENGTH_INT 2
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

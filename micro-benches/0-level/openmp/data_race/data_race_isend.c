@@ -13,6 +13,9 @@
 // is written to  (marker "B"). Only at marker "C" the MPI_Wait is posted.
 // Note: 3 threads needed to make the error occur more frequently.
 
+#define BUFFER_LENGTH_INT 300
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 3  // with less than 3, error occurs rarely
 
 bool has_error(const int *buffer) {

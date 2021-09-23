@@ -6,6 +6,9 @@
 // Deadlock occurs, if the probe (marker "A") matches to the same message on both threads meaning that one thread will
 // wait indefinitely for the message to arrive (at marker "B")
 
+#define BUFFER_LENGTH_INT 2
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

@@ -7,6 +7,9 @@
 // Data race on a buffer: A data-race can occur, as the same buffer is used in sending ( marker "A") and receive (marker
 // "B"). This may not strictly be an error according the MPI standard.
 
+#define BUFFER_LENGTH_INT 200000
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

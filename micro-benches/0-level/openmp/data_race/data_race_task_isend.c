@@ -6,6 +6,9 @@
 // Data Race on buffer: Concurrently, (omp) task A writes to the buffer (marker "A") and another task executes a
 // Isend operation using the buffer (marker "B").
 
+#define BUFFER_LENGTH_INT 8
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

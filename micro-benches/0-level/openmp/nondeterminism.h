@@ -24,10 +24,6 @@ static inline void has_error_manifested(bool manifested) {
   }
 }
 
-#define BUFFER_LENGTH_INT 1000
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
-
 // init unique message buffer and checks if the content is the expected content without the need for data transfer
 // this way we can find "wrong" message matching
 // sender and receiver need to use the same pattern_id

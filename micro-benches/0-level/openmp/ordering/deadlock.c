@@ -9,6 +9,8 @@
  * openmp syncronization is done in a way that it leads to a deadlock
  */
 
+#define BUFFER_LENGTH_INT 100
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 int main(int argc, char *argv[]) {
   int myRank;
   int provided;

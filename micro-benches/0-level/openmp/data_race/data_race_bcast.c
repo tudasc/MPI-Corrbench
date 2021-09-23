@@ -12,6 +12,9 @@
 // (marker "A"), and (b) without any synchronization ("omp barrier") passed to a
 // broadcast operation (marker "B").
 
+#define BUFFER_LENGTH_INT 100
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+
 #define NUM_THREADS 2
 
 bool has_error(const int *buffer) {
