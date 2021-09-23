@@ -9,9 +9,6 @@
 
 #define NUM_THREADS 2
 
-#define BUFFER_LENGTH_INT 100
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;

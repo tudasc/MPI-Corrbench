@@ -9,9 +9,6 @@
 // on the communicator (marker "B").
 // Free'ing the communicator before the sendrecv started is erroneous.
 
-#define BUFFER_LENGTH_INT 10000
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

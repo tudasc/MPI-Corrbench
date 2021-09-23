@@ -5,9 +5,6 @@
 
 // Deadlock: Serial deadlocking operations inside an openmp master region (marker "A").
 
-#define BUFFER_LENGTH_INT 2
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {
