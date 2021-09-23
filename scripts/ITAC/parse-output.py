@@ -1,5 +1,8 @@
 # TODO documentation at different location
 
+import re
+
+
 # input:
 # input_dir: the directory where the tool was run and output was captured
 # is_error_expected: bool if an error is expected
@@ -22,12 +25,18 @@ def parse_output(input_dir, is_error_expected, error_specification):
 
             if (data != "" and "ERROR:" in data):
                 # found something
-                # explicitly not include an ITAC segfault
-                if not "ERROR: Signal 11 caught in ITC code section." in data:
+                regex = "ERROR: [A-Z_:]+ error"
+                # regex only matches if an error class is given by itac
+                # regex does not match ERROR: Signal 11 caught in ITC code section
+                # therefore, if one process found the error and the other crashes, the error was found
+
+                if re.search(regex, data) or "ERROR: multithreading violation" in data:
                     error_found = 1
+                # else the tool crashed without an appropriate error msg
+
             elif (data != "" and "WARNING:" in data):
                 # found warning opnly
-                error_found =-2
+                error_found = -2
             elif (
                     data != "" and "INFO: Error checking completed without finding any problems." in data):
                 # found nothing
