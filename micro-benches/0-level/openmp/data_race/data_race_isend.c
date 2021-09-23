@@ -13,7 +13,7 @@
 // is written to  (marker "B"). Only at marker "C" the MPI_Wait is posted.
 // Note: 3 threads needed to make the error occur more frequently.
 
-#define NUM_THREADS 3  // with less than 3, error occurs rarely
+#define NUM_THREADS 8  // with less than 3, error occurs rarely
 
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {

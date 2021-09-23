@@ -10,7 +10,7 @@
 // Data race in parallel region due to buffer writes in parallel for loop with nowait clause (marker "A").
 // Hence, the reduce at marker "B" is executed by some thread while other threads may still write to the buffer.
 
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 bool has_error(const int *buffer, int expected) {
   for (int i = 0; i < BUFFER_LENGTH_INT; ++i) {

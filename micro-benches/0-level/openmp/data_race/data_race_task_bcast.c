@@ -6,7 +6,7 @@
 // Data Race on buffer: Concurrently, (omp) task A writes to the buffer (marker "A") and another task executes a
 // bcast operation using the buffer (marker "B").
 
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 int main(int argc, char *argv[]) {
   int provided;

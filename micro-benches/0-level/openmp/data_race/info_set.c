@@ -8,7 +8,7 @@
 // Using conflicting MPI calls on MPI_Info:
 // Concurrently setting MPI_Info (marker "A") is a data race.
 
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 int main(int argc, char *argv[]) {
   int provided;

@@ -12,7 +12,7 @@
 // Concurrently, the same MPI_Request (marker "A") is shared between
 // different threads posting an Isend (marker "B"), and waiting on it at marker "C".
 
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {

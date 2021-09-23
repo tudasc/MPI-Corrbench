@@ -12,7 +12,7 @@
 // (marker "A"), and (b) without any synchronization ("omp barrier") passed to a
 // broadcast operation (marker "B").
 
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
@@ -41,8 +41,9 @@ int main(int argc, char *argv[]) {
   int bcast_data[BUFFER_LENGTH_INT];
   fill_message_buffer(bcast_data, BUFFER_LENGTH_BYTE, 6);
 
-#pragma omp parallel num_threads(NUM_THREADS)
+#pragma omp parallel
   {
+    DISTURB_THREAD_ORDER
     bcast_data[omp_get_thread_num()] = -1; /* A */
 
 // #pragma omp barrier -- this fixes the data race error
