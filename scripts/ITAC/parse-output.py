@@ -24,15 +24,19 @@ def parse_output(input_dir, is_error_expected, error_specification):
             data = file.read().replace('\n', '')
 
             if (data != "" and "ERROR:" in data):
-                # found something
-                regex = "ERROR: [A-Z_:]+ error"
-                # regex only matches if an error class is given by itac
-                # regex does not match ERROR: Signal 11 caught in ITC code section
-                # therefore, if one process found the error and the other crashes, the error was found
 
-                if re.search(regex, data) or "ERROR: multithreading violation" in data:
+                if not "ERROR: Signal 11 caught in ITC code section" in data:
                     error_found = 1
-                # else the tool crashed without an appropriate error msg
+                else:
+                    # check if there is still a proper error msg
+                    regex = "ERROR: [A-Z_:]+ error"
+                    # regex only matches if an error class is given by itac
+                    # regex does not match ERROR: Signal 11 caught in ITC code section
+                    # therefore, if one process found the error and the other crashes, the error was found
+
+                    if re.search(regex, data) or "ERROR: multithreading violation" in data:
+                        error_found = 1
+                    # else the tool crashed without an appropriate error msg
 
             elif (data != "" and "WARNING:" in data):
                 # found warning opnly
