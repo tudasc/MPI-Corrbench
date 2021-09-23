@@ -10,9 +10,6 @@
 // Idea taken from: "Thread-safety in an MPI implementation: Requirements and analysis" by
 // W. Gropp and R. Thakur. DOI: 10.1016/j.parco.2007.07.002
 
-#define BUFFER_LENGTH_INT 10000
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {

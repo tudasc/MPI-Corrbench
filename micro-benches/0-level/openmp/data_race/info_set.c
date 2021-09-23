@@ -6,10 +6,7 @@
 #include <stdlib.h>
 
 // Using conflicting MPI calls on MPI_Info:
-// Setting MPI_Info (marker "A") should not happen concurrently from different threads according to the standard.
-
-#define BUFFER_LENGTH_INT 10000
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
+// Concurrently setting MPI_Info (marker "A") is a data race.
 
 #define NUM_THREADS 2
 
