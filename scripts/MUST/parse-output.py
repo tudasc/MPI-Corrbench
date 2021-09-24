@@ -1,7 +1,17 @@
 import pandas as pd
+import os
 
 
 # TODO documentation at different location
+
+def find_all_matching_files(name, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if name in file:
+                result.append(os.path.join(root, file))
+    return result
+
 
 # input:
 # input_dir: the directory where the tool was run and output was captured
@@ -47,6 +57,21 @@ def parse_output(input_dir, is_error_expected, error_specification):
 
             if len(warns_only) > 0:
                 error_found = -2
+
+        # check if thread-sanitizer has issued a warning
+        # in the preview version of must, we need to manually inspect the tsan log
+        if error_found == -1:
+            # tsan logs are named tsan_log.[pid]
+            print(input_dir + "/must_temp")
+            tsan_logs = find_all_matching_files("tsan_log", input_dir + "/must_temp")
+            print(tsan_logs)
+
+            for log in tsan_logs:
+                with open(log, "r") as f:
+                    data = f.read()
+                if "WARNING: ThreadSanitizer: data race" in data:
+                    error_found = 1
+                    # found a datarace
 
         # check if must has completed without detecting errors
         if error_found == -1:
