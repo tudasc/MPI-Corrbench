@@ -12,6 +12,8 @@
 #define DISTURB_THREAD_ORDER
 #endif
 
+#include <mpi.h>
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,15 +29,21 @@ static inline void has_error_manifested(bool manifested) {
   // else do nothing: we assume that an error was present unless signaled otherwise
   if (!manifested) {
     // just create the signal file
-    FILE *file_ptr = fopen(SIGNAL_FILE_NAME_ERROR, "w");
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    size_t needed = snprintf(NULL, 0, "%s%d", SIGNAL_FILE_NAME_ERROR, rank) + 1;  // +1 for trailing \0
+    char *fname = malloc(needed);
+    snprintf(fname, needed, "%s%d", SIGNAL_FILE_NAME_ERROR, rank);
+
+    FILE *file_ptr = fopen(fname, "w");
     fclose(file_ptr);
-printf("ERROR_NOT_PRESENT\n");
+    free(fname);
+    printf("ERROR_NOT_PRESENT\n");
   }
 }
 
 #define BUFFER_LENGTH_INT 1000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
 
 // init unique message buffer and checks if the content is the expected content without the need for data transfer
 // this way we can find "wrong" message matching

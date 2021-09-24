@@ -32,6 +32,7 @@ case_id = 8
 full_case_name = 9
 
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
+NUM_MPI_RANKS = 2
 
 
 def parse_command_line_args():
@@ -45,7 +46,6 @@ def parse_command_line_args():
     parser.add_argument('TOOL', choices=['MUST', 'ITAC', 'MPI-Checker', 'PARCOACH'])
     parser.add_argument('--outfile', default="results.json")
 
-
     args = parser.parse_args()
     return args
 
@@ -57,6 +57,19 @@ def module_from_path(filepath):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def check_if_error_manifested(test_dir):
+    local_error_not_manifested= 0
+
+    for i in range(NUM_MPI_RANKS):
+        if os.path.exists(test_dir.path + "/error_not_present"+i):
+            local_error_not_manifested +=1
+
+    if local_error_not_manifested== NUM_MPI_RANKS:
+        return 1# no process had an error
+    else:
+        return 0# at least one process had the error
 
 
 def main():
@@ -76,7 +89,7 @@ def main():
         if not test_dir.is_dir():
             continue
 
-        case_id=test_dir.name
+        case_id = test_dir.name
         # read the case name from directory
         with open(test_dir.path + "/case_name", 'r') as f:
             full_case = f.read().rstrip()
@@ -85,29 +98,26 @@ def main():
         code_has_error = True
         if "correct/" in full_case:
             code_has_error = False
-
-        local_error_manifested =1
-        if os.path.exists(test_dir.path + "/error_not_present"):
-            local_error_manifested = 0
+        local_error_manifested = check_if_error_manifested(test_dir)
 
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
-        data = [0, 0, 0, 0,0,0, 0,local_error_manifested,case_id,full_case]
+        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested, case_id, full_case]
 
         ## -1 = error processing case
         if error_found == -1:
             data[ERR] = 1
         else:
             if code_has_error:
-                if error_found >0:
+                if error_found > 0:
                     # TP
                     data[TP] = 1
                 else:
-                    if error_found ==-2:
-                        data[TW]=1
+                    if error_found == -2:
+                        data[TW] = 1
                     else:
                         data[FN] = 1
             else:
-                if error_found>0:
+                if error_found > 0:
                     # FP
                     data[FP] = 1
                 else:
