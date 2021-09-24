@@ -33,7 +33,10 @@ int main(int argc, char *argv[]) {
 #pragma omp section
         { MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD); /* B */ }
 #pragma omp section
-        { fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 3); /* A */ }
+        {
+          us_sleep(10);                                       // make data race more likely
+          fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 3); /* A */
+        }
       }
     }  // end parallel
 

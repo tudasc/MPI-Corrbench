@@ -51,8 +51,11 @@ int main(int argc, char *argv[]) {
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
+    DISTURB_THREAD_ORDER
 #pragma omp master
-    { MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master); /* A */ }
+    {
+      MPI_Isend(send_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &req_master); /* A */
+    }
 
     // data race fixed by adding in above master section an MPI_WAIT after the Isend
     send_data[omp_get_thread_num()] = -1; /* B */
