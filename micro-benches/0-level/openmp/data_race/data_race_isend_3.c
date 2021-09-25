@@ -14,15 +14,6 @@
 
 #define NUM_THREADS 8
 
-bool has_error(const int *buffer) {
-  for (int i = 0; i < NUM_THREADS; ++i) {
-    if (buffer[i] != -1) {
-      return true;
-    }
-  }
-  return false;
-}
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -38,32 +29,33 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  int recv_data[BUFFER_LENGTH_INT];
-  int send_data[BUFFER_LENGTH_INT];
+  int *recv_data = malloc(NUM_THREADS * BUFFER_LENGTH_BYTE);
+  int *send_data = malloc(NUM_THREADS * BUFFER_LENGTH_BYTE);
   MPI_Request req_send; /* A */
 
-  fill_message_buffer(recv_data, BUFFER_LENGTH_BYTE, 6);
-  fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 1);
+  fill_message_buffer(recv_data, NUM_THREADS * BUFFER_LENGTH_BYTE, 6);
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
     DISTURB_THREAD_ORDER
-    const int index = omp_get_thread_num();
+    const int index = omp_get_thread_num() * BUFFER_LENGTH_INT;
     MPI_Request req;
-    MPI_Irecv(&recv_data[index], 1, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req);
-
-    send_data[index] = -1;
+    MPI_Irecv(&recv_data[index], BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req);
+    fill_message_buffer(&recv_data[index], BUFFER_LENGTH_BYTE, 1);
 
 #pragma omp barrier
     // req_send is overwritten by multiple threads:
-    MPI_Isend(&send_data[index], 1, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req_send); /* B */
+    MPI_Isend(&send_data[index], BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req_send); /* B */
 
     MPI_Wait(&req_send, MPI_STATUS_IGNORE); /* C */
     MPI_Wait(&req, MPI_STATUS_IGNORE);
   }
 
-  const bool error = has_error(recv_data);
+  const bool error = !has_buffer_expected_content(recv_data, NUM_THREADS * BUFFER_LENGTH_BYTE, 1);
   has_error_manifested(error);
+
+  free(recv_data);
+  free(send_data);
 
   MPI_Finalize();
 
