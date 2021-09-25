@@ -38,21 +38,22 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  int bcast_data[BUFFER_LENGTH_INT];
-  fill_message_buffer(bcast_data, BUFFER_LENGTH_BYTE, 6);
+  int *bcast_data = malloc(NUM_THREADS * BUFFER_LENGTH_BYTE);
 
 #pragma omp parallel num_threads(NUM_THREADS)
   {
     DISTURB_THREAD_ORDER
-    bcast_data[omp_get_thread_num()] = -1; /* A */
+    const int index = omp_get_thread_num() * BUFFER_LENGTH_INT;
+    fill_message_buffer(&bcast_data[index], BUFFER_LENGTH_BYTE, rank); /* A */
 
-// #pragma omp barrier -- this fixes the data race error
+    // #pragma omp barrier -- this fixes the data race error
 #pragma omp master
     { MPI_Bcast(bcast_data, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD); /* B */ }
   }
 
-  const bool error = has_error(bcast_data);
+  const bool error = !has_buffer_expected_content(bcast_data, NUM_THREADS * BUFFER_LENGTH_BYTE, 0);
   has_error_manifested(error);
+  free(bcast_data);
 
   MPI_Finalize();
 
