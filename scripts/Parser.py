@@ -100,7 +100,7 @@ def main():
         if "correct/" in full_case:
             code_has_error = False
         local_error_manifested = check_if_error_manifested(test_dir.path)
-        local_error_manifested_without_tool = check_if_error_manifested(test_dir.path+"without_tool")
+        local_error_manifested_without_tool = check_if_error_manifested(test_dir.path+"/without_tool")
 
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
         data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case]
