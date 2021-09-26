@@ -62,9 +62,7 @@ def parse_output(input_dir, is_error_expected, error_specification):
         # in the preview version of must, we need to manually inspect the tsan log
         if error_found == -1:
             # tsan logs are named tsan_log.[pid]
-            print(input_dir + "/must_temp")
             tsan_logs = find_all_matching_files("tsan_log", input_dir + "/must_temp")
-            print(tsan_logs)
 
             for log in tsan_logs:
                 with open(log, "r") as f:
