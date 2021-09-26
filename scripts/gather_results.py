@@ -3,7 +3,7 @@ import argparse
 import importlib.util
 import json
 
-## entry: name: [TP,TN,FP,FN,ERR,error_present,case_id,full_case_name]
+## entry: name: [TP,TN,FP,FN,ERR,error_present,error_present_without_tool,case_id,full_case_name]
 # True Positive, True Negative, False Positive, False negative,
 # ERR=error in parsing the output or runnung case,
 # error_present: if the error actually manifested during execution,
@@ -17,8 +17,9 @@ TW = 4
 FW = 5
 ERR = 6
 error_present = 7
-case_id = 8
-full_case_name = 9
+error_present_without_tool = 8
+case_id = 9
+full_case_name = 10
 
 
 # read env vars
@@ -35,6 +36,7 @@ def add_cases(score, case):
     score[5] += case[5]
     score[6] += case[6]
     score[7] += case[7]
+    score[8] += case[8]
     assert score[case_id] == case[case_id]
     assert score[full_case_name] == case[full_case_name]
 
