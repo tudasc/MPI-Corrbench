@@ -14,7 +14,7 @@ import json
 # correct_error_found wether or not exactely the expected error was found
 # -1 means could not tell (e.g. output is missing or not helpful or error specification missing) 0 means false, 1 true
 
-## entry: name: [TP,TN,FP,FN,ERR,error_present,case_id,full_case_name]
+## entry: name: [TP,TN,FP,FN,ERR,error_present,error_present_without_tool,case_id,full_case_name]
 # True Positive, True Negative, False Positive, False negative,
 # ERR=error in parsing the output or runnung case,
 # error_present: if the error actually manifested during execution,
@@ -28,8 +28,9 @@ TW = 4
 FW = 5
 ERR = 6
 error_present = 7
-case_id = 8
-full_case_name = 9
+error_present_without_tool = 8
+case_id = 9
+full_case_name = 10
 
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
 NUM_MPI_RANKS = 2
@@ -63,13 +64,13 @@ def check_if_error_manifested(test_dir):
     local_error_not_manifested= 0
 
     for i in range(NUM_MPI_RANKS):
-        if os.path.exists(test_dir.path + "/error_not_present"+i):
+        if os.path.exists(test_dir + "/error_not_present%d"%(i)):
             local_error_not_manifested +=1
 
-    if local_error_not_manifested== NUM_MPI_RANKS:
-        return 1# no process had an error
+    if local_error_not_manifested == NUM_MPI_RANKS:
+        return 0# no process had an error
     else:
-        return 0# at least one process had the error
+        return 1# at least one process had the error
 
 
 def main():
@@ -98,10 +99,11 @@ def main():
         code_has_error = True
         if "correct/" in full_case:
             code_has_error = False
-        local_error_manifested = check_if_error_manifested(test_dir)
+        local_error_manifested = check_if_error_manifested(test_dir.path)
+        local_error_manifested_without_tool = check_if_error_manifested(test_dir.path+"without_tool")
 
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
-        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested, case_id, full_case]
+        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case]
 
         ## -1 = error processing case
         if error_found == -1:

@@ -3,7 +3,7 @@ import json
 input_fname_pattern = "[BENCH_BASE_DIR]/output/results_[TOOL].json"
 input_fname_pattern_mini_app_performance = "[BENCH_BASE_DIR]/output/mini_app_performance_[TOOL].json"
 
-## entry: name: [TP,TN,FP,FN,ERR,error_present,case_id,full_case_name]
+## entry: name: [TP,TN,FP,FN,ERR,error_present,error_present_without_tool,case_id,full_case_name]
 # True Positive, True Negative, False Positive, False negative,
 # ERR=error in parsing the output or runnung case,
 # error_present: if the error actually manifested during execution,
@@ -17,8 +17,9 @@ TW = 4
 FW = 5
 ERR = 6
 error_present = 7
-case_id = 8
-full_case_name = 9
+error_present_without_tool = 8
+case_id = 9
+full_case_name = 10
 
 #categories = ['pt2pt', 'coll', 'usertypes', 'rma']
 categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp/data_race','openmp/ordering','openmp/threading']
