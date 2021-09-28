@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 #pragma omp master
       {
         MPI_Send(&private_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); /* B */
-        private_data = rank; // initialization of private variable only happend after send
+        private_data = rank;  // initialization of private variable only happend after send
       }
     }
   } else if (rank == 1) {
