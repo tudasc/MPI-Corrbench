@@ -4,7 +4,7 @@
 #define USE_TEMP_COMPARE_BUF
 #define SIGNAL_FILE_NAME_ERROR "error_not_present"
 
-//#define USE_DISTURBED_THREAD_ORDER
+#define USE_DISTURBED_THREAD_ORDER
 
 #ifdef USE_DISTURBED_THREAD_ORDER
 #define DISTURB_THREAD_ORDER us_sleep(omp_get_thread_num());
@@ -42,7 +42,9 @@ static inline void has_error_manifested(bool manifested) {
   }
 }
 
-#define BUFFER_LENGTH_INT 1000
+#define NUM_THREADS 8
+#define BUFFER_LENGTH_INT 10
+//#define BUFFER_LENGTH_INT 10000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 // init unique message buffer and checks if the content is the expected content without the need for data transfer

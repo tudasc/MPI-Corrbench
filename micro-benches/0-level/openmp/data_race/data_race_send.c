@@ -34,7 +34,9 @@ int main(int argc, char *argv[]) {
         { MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD); /* B */ }
 #pragma omp section
         {
+#ifdef USE_DISTURBED_THREAD_ORDER
           us_sleep(10);                                       // make data race more likely
+#endif
           fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 3); /* A */
         }
       }
@@ -53,7 +55,9 @@ int main(int argc, char *argv[]) {
   }
 
   free(buffer);
+  printf("Finalize now\n");
   MPI_Finalize();
+  printf("after finalize\n");
 
   return 0;
 }

@@ -12,8 +12,6 @@
 // (marker "A"), and (b) without any synchronization ("omp barrier") passed to a
 // broadcast operation (marker "B").
 
-#define NUM_THREADS 8
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;

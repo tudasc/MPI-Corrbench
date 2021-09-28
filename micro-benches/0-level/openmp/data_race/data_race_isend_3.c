@@ -12,8 +12,6 @@
 // Concurrently, the same MPI_Request (marker "A") is shared between
 // different threads posting an Isend (marker "B"), and waiting on it at marker "C".
 
-#define NUM_THREADS 8
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;

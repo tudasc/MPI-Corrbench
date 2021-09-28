@@ -12,8 +12,6 @@
 // (marker "A"), and (b) without any synchronization ("omp barrier") passed to a
 // broadcast operation (marker "B").
 
-#define NUM_THREADS 8
-
 bool has_error(const int *buffer) {
   for (int i = 0; i < NUM_THREADS; ++i) {
     if (buffer[i] != -1) {

@@ -6,8 +6,6 @@
 // Data Race on buffer: Concurrently, (omp) task A writes to the buffer (marker "A") and another task executes a
 // Ibcast operation using the buffer (marker "B").
 
-#define NUM_THREADS 8
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -35,7 +33,9 @@ int main(int argc, char *argv[]) {
       {
 #pragma omp task  // fix for data race: depend(out : send_data)
         {
+#ifdef USE_DISTURBED_THREAD_ORDER
           us_sleep(10);                                          // Data race is very rare otherwise
+#endif
           fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6); /* A */
         }
 #pragma omp task  // fix for data race: depend(in : send_data)

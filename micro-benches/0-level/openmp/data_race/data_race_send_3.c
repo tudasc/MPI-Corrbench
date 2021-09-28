@@ -12,8 +12,6 @@
 // send operation (marker "B").
 // Note: The MPI_Barrier is not sufficient to protect against the race (marker "C").
 
-#define NUM_THREADS 8
-
 // Data Race may occur between computing the msg buffer (location A) and the send operation (location B)
 
 bool has_error(const int *buffer) {

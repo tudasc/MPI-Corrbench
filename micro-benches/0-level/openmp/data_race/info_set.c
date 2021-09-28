@@ -8,6 +8,9 @@
 // Using conflicting MPI calls on MPI_Info:
 // Concurrently setting MPI_Info (marker "A") is a data race.
 
+// this test only works with 2 Threads currently
+//TODO re-implement it to work with an arbitrary amount of Threads
+#undef NUM_THREADS
 #define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {
