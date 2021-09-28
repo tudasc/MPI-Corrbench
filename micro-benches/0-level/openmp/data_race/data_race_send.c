@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 #pragma omp section
         {
 #ifdef USE_DISTURBED_THREAD_ORDER
-          us_sleep(10);                                       // make data race more likely
+          us_sleep(10);  // make data race more likely
 #endif
           fill_message_buffer(buffer, BUFFER_LENGTH_BYTE, 3); /* A */
         }

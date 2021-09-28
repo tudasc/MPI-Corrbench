@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 #pragma omp task  // fix for data race: depend(out : send_data)
         {
 #ifdef USE_DISTURBED_THREAD_ORDER
-          us_sleep(10);                                          // Data race is very rare otherwise
+          us_sleep(10);  // Data race is very rare otherwise
 #endif
           fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 6); /* A */
         }
