@@ -31,10 +31,11 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS) default(shared) private(private_data) /* A */
   {
 #pragma omp master
-    { MPI_Ibcast(&private_data, 1, MPI_INT, 0, MPI_COMM_WORLD, &req); /* B */ }
+    {
+      MPI_Ibcast(&private_data, 1, MPI_INT, 0, MPI_COMM_WORLD, &req); /* B */
+      MPI_Wait(&req, MPI_STATUS_IGNORE);
+    }
   }
-
-  MPI_Wait(&req, MPI_STATUS_IGNORE);
 
   if (rank == 1) {
     has_error_manifested(private_data != 0);

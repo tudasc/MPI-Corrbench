@@ -38,9 +38,12 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS) default(shared) private(private_data) /* A */
     {
 #pragma omp master
-      { MPI_Isend(&private_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &send_req); /* B */ }
+      {
+        MPI_Isend(&private_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &send_req); /* B */
+        MPI_Wait(&send_req, MPI_STATUS_IGNORE);
+      }
     }
-    MPI_Wait(&send_req, MPI_STATUS_IGNORE);
+
   } else if (rank == 1) {
     MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
