@@ -6,6 +6,10 @@
 
 #define USE_DISTURBED_THREAD_ORDER
 
+// circumvent a tsan bug when using memset
+// if definded memory is touced in a for loop
+#define CIRCUMVENT_TSAN_BUG
+
 #ifdef USE_DISTURBED_THREAD_ORDER
 #define DISTURB_THREAD_ORDER us_sleep(omp_get_thread_num());
 #else
@@ -42,7 +46,7 @@ static inline void has_error_manifested(bool manifested) {
   }
 }
 
-#define NUM_THREADS 8
+#define NUM_THREADS 2
 #define BUFFER_LENGTH_INT 10
 //#define BUFFER_LENGTH_INT 10000
 #define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
@@ -54,7 +58,15 @@ static inline void has_error_manifested(bool manifested) {
 const unsigned char pattern_list[8] = {0x0F, 0xF0, 0xAA, 0x55, 0x99, 0xCC, 0x00, 0xFF};
 
 static inline void fill_message_buffer(void *buf, size_t length, int pattern) {
+#ifdef CIRCUMVENT_TSAN_BUG
+  char *buf_ptr = (char *)buf;  // make it clear that we iterate through the single bytes
+  for (size_t i = 0; i < length; ++i) {
+    buf_ptr[i] = pattern_list[pattern];
+  }
+
+#else
   memset(buf, pattern_list[pattern], length);
+#endif
 }
 
 // check if message buffer is correct
