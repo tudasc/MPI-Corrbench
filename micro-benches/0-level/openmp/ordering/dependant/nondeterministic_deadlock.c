@@ -37,7 +37,11 @@ int main(int argc, char *argv[]) {
       }
     } else {  // other MPI rank
 #pragma omp for
+#ifdef USE_DISTURBED_THREAD_ORDER
       for (int i = 10000; i > 0; --i) {
+#else
+      for (int i = 0; i > 10000; ++i) {
+#endif
 // different loop ordering increases the chance that deadlock actually manifests but as
 // ordering of tasks is undefined in OpenMP
 // this does not make a difference in the programs semantic

@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS)
   {
     if (rank == 0) {
+      DISTURB_THREAD_ORDER
 #pragma omp sections
       {
 #pragma omp section
@@ -57,7 +58,11 @@ int main(int argc, char *argv[]) {
 
   MPI_Finalize();
 
+#ifdef USE_DISTURBED_THREAD_ORDER
+  has_error_manifested(true);  // true is default, so if it deadlocks, it is ok
+#else
   has_error_manifested(false);
+#endif
 
   return 0;
 }

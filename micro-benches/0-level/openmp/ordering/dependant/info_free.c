@@ -33,14 +33,29 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp single nowait
-    { MPI_Info_set(info_obj, "Hello", "World"); /* A */ }
+    {
+#ifdef USE_DISTURBED_THREAD_ORDER
+      us_sleep(10);
+#endif
+      MPI_Info_set(info_obj, "Hello", "World"); /* A */
+    }
 #pragma omp single
-    { MPI_Info_free(&info_obj); /* B */ }
+    {
+#ifndef USE_DISTURBED_THREAD_ORDER
+      us_sleep(10);
+#endif
+
+      MPI_Info_free(&info_obj); /* B */
+    }
   }
 
   MPI_Finalize();
 
+#ifdef USE_DISTURBED_THREAD_ORDER
   has_error_manifested(true);
+#else
+  has_error_manifested(false);
+#endif
 
   return 0;
 }

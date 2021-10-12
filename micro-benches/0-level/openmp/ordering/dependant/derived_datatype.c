@@ -42,18 +42,30 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp single nowait
     {
-      us_sleep(1);
+#ifdef USE_DISTURBED_THREAD_ORDER
+      us_sleep(10);
+#endif
       MPI_Send(send_data, 1, mult_ints_dtype, size - rank - 1, 1, MPI_COMM_WORLD); /* A */
     }
 #pragma omp single
-    { MPI_Type_free(&mult_ints_dtype); /* B */ }
+    {
+#ifndef USE_DISTURBED_THREAD_ORDER
+      us_sleep(10);
+#endif
+
+      MPI_Type_free(&mult_ints_dtype); /* B */
+    }
   }
 
   MPI_Wait(&req, MPI_STATUS_IGNORE);
 
   MPI_Finalize();
 
+#ifdef USE_DISTURBED_THREAD_ORDER
   has_error_manifested(true);
+#else
+  has_error_manifested(false);
+#endif
 
   return 0;
 }

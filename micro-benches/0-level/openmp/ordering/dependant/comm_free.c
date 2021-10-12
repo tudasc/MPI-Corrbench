@@ -46,6 +46,9 @@ int main(int argc, char *argv[]) {
   {
 #pragma omp single nowait
     {
+#ifdef USE_DISTURBED_THREAD_ORDER
+      us_sleep(20);
+#endif
       MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1,
                    other_comm_world, MPI_STATUS_IGNORE); /* A */
     }
@@ -55,8 +58,11 @@ int main(int argc, char *argv[]) {
   }
 
   MPI_Finalize();
-
+#ifdef USE_DISTURBED_THREAD_ORDER
+  has_error_manifested(true);
+#else
   has_error_manifested(false);
+#endif
 
   return 0;
 }

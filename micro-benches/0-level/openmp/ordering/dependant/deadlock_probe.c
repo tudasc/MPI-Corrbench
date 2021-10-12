@@ -57,7 +57,10 @@ int main(int argc, char *argv[]) {
 #pragma omp section
         {
           // A:
-          // usleep(50) fixes ordering
+
+#ifndef USE_DISTURBED_THREAD_ORDER
+          us_sleep(50);
+#endif
           omp_set_lock(&lock);
           MPI_Status status;
           MPI_Probe(0, 2, MPI_COMM_WORLD, &status);
@@ -73,6 +76,9 @@ int main(int argc, char *argv[]) {
         }
 #pragma omp section
         {
+#ifdef USE_DISTURBED_THREAD_ORDER
+          us_sleep(50);
+#endif
           // B:
           omp_set_lock(&lock);
           MPI_Status status;
@@ -94,7 +100,11 @@ int main(int argc, char *argv[]) {
   }
   MPI_Finalize();
 
+#ifdef USE_DISTURBED_THREAD_ORDER
+  has_error_manifested(true);  // true is default, so if it deadlocks, it is ok
+#else
   has_error_manifested(false);
+#endif
 
   return 0;
 }

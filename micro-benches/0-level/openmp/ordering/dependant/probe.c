@@ -47,8 +47,11 @@ int main(int argc, char *argv[]) {
 
     } else if (rank == 1) {
       MPI_Status status;
+
+      // TODO make "shure a correct ordering if ndef"
       MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status); /* A */
 
+      DISTURB_THREAD_ORDER
       int count;
       MPI_Get_count(&status, MPI_INT, &count);
 
