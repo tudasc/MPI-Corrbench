@@ -6,7 +6,7 @@ module load gcc llvm/10 intelmpi/test
 
 source ~/modules/software/intelmpi/setvars.sh
 
-#intelmpi /mpich
+#use clang, so we will use the same compiler/ same openmp implementation for all tests
 export MPICC="mpigcc -cc=clang"
 export CC="mpigcc -cc=clang"
 export MPICXX="mpigxx -cxx=clang++"
@@ -22,7 +22,7 @@ TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 mkdir without_tool
 cd without_tool
 
-/usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC -g -fopenmp ../testcase.c -lm
+/usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC $CORRBENCH_CFLAGS -g -fopenmp ../testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run_baseline $TIMEOUT_CMD mpirun -n 2 ./a.out 1> /dev/null 2>&1
 
@@ -30,7 +30,7 @@ rm a.out
 cd ..
 
 # with tool
-/usr/bin/time --format "%e,%M" -o time_compile $MPICC -g -fopenmp testcase.c -lm
+/usr/bin/time --format "%e,%M" -o time_compile $MPICC $CORRBENCH_CFLAGS -g -fopenmp testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mpirun -n 2 -check_mpi -genv VT_CHECK_TRACING on ./a.out 1> output.txt 2>&1
 

@@ -27,7 +27,7 @@ TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 # without tool
 mkdir without_tool
 cd without_tool
-/usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC -g -fopenmp ../testcase.c -lm
+/usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC $CORRBENCH_CFLAGS -g -fopenmp ../testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run_baseline $TIMEOUT_CMD mpirun -n 2 ./a.out
 
@@ -35,7 +35,10 @@ rm a.out
 cd ..
 
 # with tool
-/usr/bin/time --format "%e,%M" -o time_compile $MPICC -g -fopenmp -fsanitize=thread testcase.c -lm
+#/usr/bin/time --format "%e,%M" -o time_compile $MPICC $CORRBENCH_CFLAGS -g -fopenmp -fsanitize=thread testcase.c -lm
+echo "$MPICC $CORRBENCH_CFLAGS -g -fopenmp -fsanitize=thread testcase.c -lm"
+
+/usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun --must:distributed --must:hybrid -n 2 ./a.out
 
 #/usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun --must:distributed --must:hybrid -n 2 ./a.out
 #suse tandard must mode for crash handeling
