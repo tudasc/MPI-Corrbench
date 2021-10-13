@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
     } else if (rank == 1) {
       MPI_Status status;
 
-      // TODO make "shure a correct ordering if ndef"
       MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status); /* A */
 
       DISTURB_THREAD_ORDER
@@ -76,12 +75,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  MPI_Finalize();
+  has_error_manifested(has_race);
+  if (has_race)
+    printf("Has race\n");
 
-  if (rank == 1) {
-    has_error_manifested(has_race);
-    if (has_race)
-      printf("Has race\n");
-  }
+  MPI_Finalize();
   return 0;
 }

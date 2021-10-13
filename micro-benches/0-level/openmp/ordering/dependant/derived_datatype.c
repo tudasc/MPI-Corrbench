@@ -59,13 +59,13 @@ int main(int argc, char *argv[]) {
 
   MPI_Wait(&req, MPI_STATUS_IGNORE);
 
-  MPI_Finalize();
-
 #ifdef USE_DISTURBED_THREAD_ORDER
   has_error_manifested(true);
 #else
   has_error_manifested(false);
 #endif
+
+  MPI_Finalize();
 
   return 0;
 }

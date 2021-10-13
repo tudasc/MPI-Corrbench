@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 #ifdef USE_DISTURBED_THREAD_ORDER
       for (int i = 10000; i > 0; --i) {
 #else
-      for (int i = 0; i > 10000; ++i) {
+      for (int i = 0; i < 10000; ++i) {
 #endif
 // different loop ordering increases the chance that deadlock actually manifests but as
 // ordering of tasks is undefined in OpenMP

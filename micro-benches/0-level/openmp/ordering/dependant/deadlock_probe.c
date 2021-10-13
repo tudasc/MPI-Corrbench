@@ -98,13 +98,14 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  MPI_Finalize();
 
 #ifdef USE_DISTURBED_THREAD_ORDER
   has_error_manifested(true);  // true is default, so if it deadlocks, it is ok
 #else
   has_error_manifested(false);
 #endif
+
+  MPI_Finalize();
 
   return 0;
 }
