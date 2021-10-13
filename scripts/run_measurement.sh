@@ -64,7 +64,7 @@ while IFS= read -r line; do
 		fi
 	done
 
-f=$((i+1))
+f=$((f+1))
 done < cflags_list
 # for each set of cflags
 	echo "submitted jobs for $TOOL"
