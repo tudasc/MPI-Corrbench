@@ -31,7 +31,8 @@ OUT_DIR=$BENCH_BASE_DIR/output
 SCRIPTS_DIR=$BENCH_BASE_DIR/scripts
 SRC_DIR=$BENCH_BASE_DIR/micro-benches
 
-TOOLS="MUST ITAC MPI-Checker PARCOACH"
+TOOLS="MUST ITAC"
+#TOOLS="MUST ITAC MPI-Checker PARCOACH"
 
 
 for TOOL in $TOOLS ; do
@@ -44,20 +45,28 @@ for TOOL in $TOOLS ; do
 	mkdir -p $OUT_DIR
 	mkdir -p $OUT_DIR/$TOOL
 
-	bash $SCRIPTS_DIR/job_script_generator.sh $TOOL
+f=0
+while IFS= read -r line; do
+    echo "cflags $line"
+
+	bash $SCRIPTS_DIR/job_script_generator.sh $TOOL "$line" 2Ranks$f.sh
 
 	for i in $(seq 1 $NUM_RUNS); do
-		JID=$(sbatch $SCRIPTS_DIR/$TOOL/2Ranks.sh | grep "Submitted batch job" | cut -d' ' -f 4)
+		JID=$(sbatch $SCRIPTS_DIR/$TOOL/2Ranks$f.sh | grep "Submitted batch job" | cut -d' ' -f 4)
 		if ! [[ $JID =~ $num_re ]] ; then
-			echo "Error during job submission ABORT"
+			echo "Error during job submission: ABORT"
 			exit
 		fi
         	JID_PARSER=$(sbatch --dependency afterok:$JID $SCRIPTS_DIR/$TOOL/parsing.sh | grep "Submitted batch job" | cut -d' ' -f 4)
 		if ! [[ $JID =~ $num_re ]] ; then
-			echo "Error during job submission ABORT"
+			echo "Error during job submission: ABORT"
 			exit
 		fi
 	done
+
+f=$((i+1))
+done < cflags_list
+# for each set of cflags
 	echo "submitted jobs for $TOOL"
 done
 
