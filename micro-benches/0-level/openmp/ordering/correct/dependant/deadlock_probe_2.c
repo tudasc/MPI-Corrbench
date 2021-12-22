@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
       MPI_Get_count(&status, MPI_INT, &count);
 
       int *value = (int *)malloc(sizeof(int) * count);
-      MPI_Mrecv(value, count, MPI_INT, 0, &message, MPI_STATUS_IGNORE); /* B */
+      MPI_Mrecv(value, count, MPI_INT, &message, MPI_STATUS_IGNORE); /* B */
 
       free(value);
     }
