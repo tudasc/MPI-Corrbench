@@ -31,7 +31,8 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS) private(info_obj)
   {
     MPI_Info_create(&info_obj);
-    MPI_Info_set(info_obj, "Hello", values[omp_get_thread_num()] MPI_Info_free(&info_obj);); /* A */
+    MPI_Info_set(info_obj, "Hello", values[omp_get_thread_num()]);
+    MPI_Info_free(&info_obj);); /* A */
   }
 
   MPI_Finalize();
