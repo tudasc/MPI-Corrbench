@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
           omp_set_lock(&lock);
           MPI_Status status;
           MPI_Message message;
-          MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD,'&message, &status);
+          MPI_Mprobe(0, MPI_ANY_TAG, MPI_COMM_WORLD,&message, &status);
 
           int local_size = 0;
           MPI_Get_count(&status, MPI_INT, &local_size);
