@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 
     } else {  // other MPI rank
       MPI_Recv(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+// this barrier will only advance if all msgs from the other rank where send
 #pragma omp barrier
       MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, 123, MPI_COMM_WORLD);
     }
