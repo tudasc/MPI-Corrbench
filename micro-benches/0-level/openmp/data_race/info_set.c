@@ -31,13 +31,14 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS) reduction(+ : overlap_count)
   {
     size_t length = snprintf(NULL, 0, "Thread %d", omp_get_thread_num());
-    char *s = malloc(length + 1) snprintf(s, length + 1, "Thread %d", omp_get_thread_num());
+    char *s = malloc(length + 1);
+    snprintf(s, length + 1, "Thread %d", omp_get_thread_num());
 
     CHECK_OVERLAP_BEGIN
     MPI_Info_set(info_obj, "Hello", s); /* A */
     CHECK_OVERLAP_END
 
-    free(s)
+    free(s);
   }
 
   MPI_Info_free(&info_obj);

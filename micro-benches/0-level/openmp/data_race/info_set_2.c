@@ -33,11 +33,12 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS) private(info_obj)
   {
     size_t length = snprintf(NULL, 0, "Thread %d", omp_get_thread_num());
-    char *s = malloc(length + 1) snprintf(s, length + 1, "Thread %d", omp_get_thread_num());
+    char *s = malloc(length + 1);
+    snprintf(s, length + 1, "Thread %d", omp_get_thread_num());
 
     MPI_Info_set(info_obj, "Hello", s); /* A */
 
-    free(s)
+    free(s);
   }
 
   MPI_Info_free(&info_obj);
