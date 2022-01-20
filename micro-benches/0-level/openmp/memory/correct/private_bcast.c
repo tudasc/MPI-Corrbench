@@ -7,8 +7,6 @@
 
 // firstprivate is initialized
 
-#define NUM_THREADS 2
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;

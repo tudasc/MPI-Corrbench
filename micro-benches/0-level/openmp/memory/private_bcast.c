@@ -8,8 +8,6 @@
 // A private variable (uninitialized in parallel region, marker "A") may cause undefined behavior when broadcasted
 // (marker "B") (and used in a different process).
 
-#define NUM_THREADS 2
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;

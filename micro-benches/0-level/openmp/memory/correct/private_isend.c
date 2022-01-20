@@ -7,11 +7,6 @@
 
 // firstprivate is initialized
 
-#define BUFFER_LENGTH_INT 1
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
-
-#define NUM_THREADS 2
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_FUNNELED;

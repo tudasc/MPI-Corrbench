@@ -9,8 +9,6 @@
 // on the communicator (marker "B").
 // Free'ing the communicator before the sendrecv started is erroneous.
 
-#define NUM_THREADS 2
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;

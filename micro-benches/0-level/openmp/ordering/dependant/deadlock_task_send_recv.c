@@ -6,8 +6,6 @@
 // Deadlock: If two processes with one thread each execute this code, it may deadlock.
 // P_0 and P_1 both post either the recv (marker "A") or the send (marker "B"), the deadlock occurs.
 
-#define NUM_THREADS 1
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
