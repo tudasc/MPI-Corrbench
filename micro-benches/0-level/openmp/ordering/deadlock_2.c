@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
   if (myRank == 0) {
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
     {
       int *buffer = malloc(BUFFER_LENGTH_BYTE);
       MPI_Send(buffer, BUFFER_LENGTH_INT, MPI_INT, 1, 123, MPI_COMM_WORLD);

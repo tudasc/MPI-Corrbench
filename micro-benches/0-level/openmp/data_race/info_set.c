@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   MPI_Info info_obj;
   MPI_Info_create(&info_obj);
 
-#pragma omp parallel num_threads(NUM_THREADS) reduction(+ : overlap_count)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
     size_t length = snprintf(NULL, 0, "Thread %d", omp_get_thread_num());
     char *s = malloc(length + 1);

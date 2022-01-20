@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   }
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
   {
     int tid = omp_get_thread_num();
     if (myRank == 0) {

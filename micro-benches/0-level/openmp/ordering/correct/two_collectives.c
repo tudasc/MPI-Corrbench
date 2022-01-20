@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
   const int other_rank = size - myRank - 1;
 
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp critical
     MPI_Barrier(MPI_COMM_WORLD);

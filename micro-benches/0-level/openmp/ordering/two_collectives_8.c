@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     fill_message_buffer(buffer_int, BUFFER_LENGTH_BYTE, 2);
   }
 
-#pragma omp parallel num_threads(2) reduction(+ : overlap_count)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp task
     {

@@ -49,7 +49,7 @@
   int before;                                    \
   _Pragma("omp atomic capture") before = flag++; \
   if (before != 0)                               \
-    overlap_count++;
+    _Pragma("omp atomic") overlap_count++;
 // its not that important to count the exact number of overlapping operations, as one overlap is already faulty in our
 // cases
 

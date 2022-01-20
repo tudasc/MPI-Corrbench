@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     // printf("Sending Buffer: %X\n", buffer[75]);//for reference
 
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
     {
 #pragma omp sections
       {

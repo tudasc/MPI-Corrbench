@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   fill_message_buffer(recv_data, BUFFER_LENGTH_BYTE, 6);
   fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 1);
 
-#pragma omp parallel num_threads(NUM_THREADS) reduction(+ : overlap_count)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
     const int index = omp_get_thread_num();
     CHECK_OVERLAP_BEGIN

@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
   const int other_rank = size - myRank - 1;
 
-#pragma omp parallel num_threads(2)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp task
     {

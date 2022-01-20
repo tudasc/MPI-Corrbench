@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 
   const int value = 5;
 
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
   {
     DISTURB_THREAD_ORDER
 #pragma omp for nowait

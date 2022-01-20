@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
   const int other_rank = size - myRank - 1;
 
-#pragma omp parallel reduction(+ : overlap_count)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
     CHECK_OVERLAP_BEGIN
     MPI_Barrier(MPI_COMM_WORLD);

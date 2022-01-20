@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     fill_message_buffer(buffer_int, BUFFER_LENGTH_BYTE, 2);
   }
 
-#pragma omp parallel num_threads(2)
+#pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp critical
     MPI_Bcast(buffer_int, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD);
