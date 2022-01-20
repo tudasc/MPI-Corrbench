@@ -4,7 +4,20 @@
 #define USE_TEMP_COMPARE_BUF
 #define SIGNAL_FILE_NAME_ERROR "error_not_present"
 
-#define USE_DISTURBED_THREAD_ORDER
+// Settings for execution
+//#define USE_DISTURBED_THREAD_ORDER
+
+// define default vlaues if define via compiler option in missing
+#ifndef NUM_THREADS
+#define NUM_THREADS 2
+#endif
+
+#ifndef BUFFER_LENGTH_INT
+#define BUFFER_LENGTH_INT 10
+//#define BUFFER_LENGTH_INT 10000
+#endif
+
+#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 // circumvent a tsan bug when using memset
 // if definded memory is touced in a for loop
@@ -17,6 +30,7 @@
 #endif
 
 #include <mpi.h>
+#include <omp.h>
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -26,6 +40,32 @@
 #ifdef USE_TEMP_COMPARE_BUF
 #include <stdlib.h>
 #endif
+
+// macros to check for a correct ordering of the MPI calls
+#define DEF_ORDER_CAPTURING_VARIABLES \
+  int flag = 0, before_a = 0, after_a = 0, before_b = 0, after_b = 0, overlap_count = 0;
+
+#define CHECK_OVERLAP_BEGIN                      \
+  int before;                                    \
+  _Pragma("omp atomic capture") before = flag++; \
+  if (before != 0)                               \
+    overlap_count++;
+// its not that important to count the exact number of overlapping operations, as one overlap is already faulty in our
+// cases
+
+// overlap will be checked on entry
+#define CHECK_OVERLAP_END _Pragma("omp atomic ")-- flag;
+
+// can only be used, when each operation is only executed once
+#define ENTER_CALL_A _Pragma("omp atomic capture") before_a = flag++;
+
+#define EXIT_CALL_A _Pragma("omp atomic capture") after_a = flag++;
+
+#define ENTER_CALL_B _Pragma("omp atomic capture") before_b = flag++;
+
+#define EXIT_CALL_B _Pragma("omp atomic capture") after_b = flag++;
+
+#define CHECK_FOR_EXPECTED_ORDER (before_a == 0 && after_a == 1 && before_b == 2 && after_b == 3)
 
 // Tell Corrbench if the error has manifested itself
 // or if there was no error e.g. "wrong" thread ordering prevented a data race
@@ -45,11 +85,6 @@ static inline void has_error_manifested(bool manifested) {
     printf("ERROR_NOT_PRESENT\n");
   }
 }
-
-#define NUM_THREADS 2
-#define BUFFER_LENGTH_INT 10
-//#define BUFFER_LENGTH_INT 10000
-#define BUFFER_LENGTH_BYTE (BUFFER_LENGTH_INT * sizeof(int))
 
 // init unique message buffer and checks if the content is the expected content without the need for data transfer
 // this way we can find "wrong" message matching

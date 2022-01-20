@@ -26,6 +26,10 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
+  printf("BEFORE: %i,%i,%i,%i\n", before_a, after_a, before_b, after_b);
+
   int recv_data[BUFFER_LENGTH_INT];
   int send_data[BUFFER_LENGTH_INT];
 
@@ -49,8 +53,10 @@ int main(int argc, char *argv[]) {
 #ifdef USE_DISTURBED_THREAD_ORDER
       us_sleep(20);
 #endif
+      ENTER_CALL_A
       MPI_Sendrecv(send_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1, recv_data, BUFFER_LENGTH_INT, MPI_INT, to_rank, 1,
                    other_comm_world, MPI_STATUS_IGNORE); /* A */
+      EXIT_CALL_A
     }
 
 #pragma omp single
@@ -58,15 +64,13 @@ int main(int argc, char *argv[]) {
 #ifndef USE_DISTURBED_THREAD_ORDER
       us_sleep(20);
 #endif
+      ENTER_CALL_B
       MPI_Comm_free(&other_comm_world); /* B */
+      EXIT_CALL_B
     }
   }
 
-#ifdef USE_DISTURBED_THREAD_ORDER
-  has_error_manifested(true);
-#else
-  has_error_manifested(false);
-#endif
+  has_error_manifested(!CHECK_FOR_EXPECTED_ORDER);
 
   MPI_Finalize();
   return 0;

@@ -8,11 +8,7 @@
 // Using conflicting MPI calls on MPI_Info:
 // Concurrently setting MPI_Info (marker "A") is a data race.
 
-// this test only works with 2 Threads currently
 // making the info obj private will cause MPI to access an uninitialized object
-
-#undef NUM_THREADS
-#define NUM_THREADS 2
 
 int main(int argc, char *argv[]) {
   int provided;
@@ -35,12 +31,19 @@ int main(int argc, char *argv[]) {
   const char *values[2] = {"Thread 1", "Thread 2"};
 
 #pragma omp parallel num_threads(NUM_THREADS) private(info_obj)
-  { MPI_Info_set(info_obj, "Hello", values[omp_get_thread_num()]); /* A */ }
+  {
+    size_t length = snprintf(NULL, 0, "Thread %d", omp_get_thread_num());
+    char *s = malloc(length + 1) snprintf(s, length + 1, "Thread %d", omp_get_thread_num());
+
+    MPI_Info_set(info_obj, "Hello", s); /* A */
+
+    free(s)
+  }
 
   MPI_Info_free(&info_obj);
   MPI_Finalize();
 
-  has_error_manifested(true);
+  has_error_manifested(true);  // using uninitialized memory is undefined bahavior
 
   return 0;
 }

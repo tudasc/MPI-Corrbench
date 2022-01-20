@@ -23,11 +23,18 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   const int other_rank = size - myRank - 1;
 
-#pragma omp parallel
-  { MPI_Barrier(MPI_COMM_WORLD); }  // end parallel
+#pragma omp parallel reduction(+ : overlap_count)
+  {
+    CHECK_OVERLAP_BEGIN
+    MPI_Barrier(MPI_COMM_WORLD);
+    CHECK_OVERLAP_END
+  }  // end parallel
 
+  has_error_manifested(overlap_count != 0);
   MPI_Finalize();
 
   return 0;

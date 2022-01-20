@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
+  DEF_ORDER_CAPTURING_VARIABLES
 #pragma omp parallel
   {
 #pragma omp for
@@ -36,20 +37,31 @@ int main(int argc, char *argv[]) {
 #pragma omp section
       {
         if (myRank == 0) {
+          ENTER_CALL_A
           MPI_Send(buffer_out, 10, MPI_INT, 1, 123, MPI_COMM_WORLD);
+          EXIT_CALL_A
         } else if (myRank == 1) {
-          usleep(5);  // make wrong thread ordering more liekly
+#ifdef USE_DISTURBED_THREAD_ORDER
+          us_sleep(20);
+#endif
+          ENTER_CALL_A
           MPI_Recv(buffer_in, 10, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          EXIT_CALL_A
         }
       }
 #pragma omp section
       {
-        usleep(1);  // make wrong thread ordering more liekly
+#ifndef USE_DISTURBED_THREAD_ORDER
+        us_sleep(20);
+#endif
+        ENTER_CALL_A
         MPI_Finalize();
+        EXIT_CALL_B
       }
     }
   }
   // end of omp parallel
 
+  has_error_manifested(!CHECK_FOR_EXPECTED_ORDER);
   return 0;
 }

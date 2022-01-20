@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
     MPI_Recv(buffer_in, 10, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
+  has_error_manifested(NUM_THREADS > 1);
   MPI_Finalize();
 
   return 0;

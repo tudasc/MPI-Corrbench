@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     }
   }  // end parallel
 
-  // if reaches:
+  // if reaches: (else error_present(true) is the default)
   has_error_manifested(false);
   MPI_Finalize();
 

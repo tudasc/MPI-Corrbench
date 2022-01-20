@@ -8,11 +8,6 @@
 // Using conflicting MPI calls on MPI_Info:
 // Concurrently setting MPI_Info (marker "A") is a data race.
 
-// this test only works with 2 Threads currently
-// TODO re-implement it to work with an arbitrary amount of Threads
-#undef NUM_THREADS
-#define NUM_THREADS 2
-
 int main(int argc, char *argv[]) {
   int provided;
   const int requested = MPI_THREAD_MULTIPLE;
@@ -28,18 +23,27 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   MPI_Info info_obj;
   MPI_Info_create(&info_obj);
 
-  const char *values[2] = {"Thread 1", "Thread 2"};
+#pragma omp parallel num_threads(NUM_THREADS) reduction(+ : overlap_count)
+  {
+    size_t length = snprintf(NULL, 0, "Thread %d", omp_get_thread_num());
+    char *s = malloc(length + 1) snprintf(s, length + 1, "Thread %d", omp_get_thread_num());
 
-#pragma omp parallel num_threads(NUM_THREADS)
-  { MPI_Info_set(info_obj, "Hello", values[omp_get_thread_num()]); /* A */ }
+    CHECK_OVERLAP_BEGIN
+    MPI_Info_set(info_obj, "Hello", s); /* A */
+    CHECK_OVERLAP_END
+
+    free(s)
+  }
 
   MPI_Info_free(&info_obj);
   MPI_Finalize();
 
-  has_error_manifested(true);
+  has_error_manifested(overlap_count != 0);
 
   return 0;
 }

@@ -29,6 +29,8 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   const int other_rank = size - myRank - 1;
 
   int *buffer_int = malloc(BUFFER_LENGTH_BYTE);
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
     fill_message_buffer(buffer_int, BUFFER_LENGTH_BYTE, 2);
   }
 
-#pragma omp parallel num_threads(2)
+#pragma omp parallel num_threads(2) reduction(+ : overlap_count)
   {
 #pragma omp task
     {

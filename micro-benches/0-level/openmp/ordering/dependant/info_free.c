@@ -27,6 +27,8 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   MPI_Info info_obj;
   MPI_Info_create(&info_obj);
 
@@ -37,23 +39,22 @@ int main(int argc, char *argv[]) {
 #ifdef USE_DISTURBED_THREAD_ORDER
       us_sleep(10);
 #endif
+      ENTER_CALL_A
       MPI_Info_set(info_obj, "Hello", "World"); /* A */
+      EXIT_CALL_A
     }
 #pragma omp single
     {
 #ifndef USE_DISTURBED_THREAD_ORDER
       us_sleep(10);
 #endif
-
+      ENTER_CALL_B
       MPI_Info_free(&info_obj); /* B */
+      EXIT_CALL_B
     }
   }
 
-#ifdef USE_DISTURBED_THREAD_ORDER
-  has_error_manifested(true);
-#else
-  has_error_manifested(false);
-#endif
+  has_error_manifested(!CHECK_FOR_EXPECTED_ORDER);
 
   MPI_Finalize();
 

@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   }
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-#pragma omp parallel
+#pragma omp parallel num_threads(NUM_THREADS)
   {
 #pragma omp for
     for (int i = 0; i < 10; i++) {
@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
     MPI_Recv(buffer_in, 10, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
+  has_error_manifested(NUM_THREADS > 1);
   MPI_Finalize();
 
   return 0;

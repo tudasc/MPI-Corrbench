@@ -24,11 +24,17 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   const int other_rank = size - myRank - 1;
 
   if (myRank == 0) {
-#pragma omp parallel num_threads(2)
-    { MPI_Barrier(MPI_COMM_WORLD); }  // end parallel
+#pragma omp parallel num_threads(2) reduction(+ : overlap_count)
+    {
+      CHECK_OVERLAP_BEGIN
+      MPI_Barrier(MPI_COMM_WORLD);
+      CHECK_OVERLAP_END
+    }  // end parallel
   }
 
   else {        // other MPI rank
@@ -37,6 +43,7 @@ int main(int argc, char *argv[]) {
     MPI_Barrier(MPI_COMM_WORLD);  // prevent deadlock
   }
 
+  has_error_manifested(overlap_count != 0);
   MPI_Finalize();
 
   return 0;

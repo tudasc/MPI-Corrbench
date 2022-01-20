@@ -42,6 +42,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // true is default, so if it deadlocks, it is ok
+  // so only signal, if it does not deadlock
   has_error_manifested(false);
 
   MPI_Finalize();

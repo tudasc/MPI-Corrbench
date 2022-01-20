@@ -28,6 +28,8 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   const int other_rank = size - myRank - 1;
 
   int *buffer_int = malloc(BUFFER_LENGTH_BYTE);
@@ -38,12 +40,20 @@ int main(int argc, char *argv[]) {
     fill_message_buffer(buffer_int, BUFFER_LENGTH_BYTE, 2);
   }
 
-#pragma omp parallel num_threads(2)
+#pragma omp parallel num_threads(2) reduction(+ : overlap_count)
   {
 #pragma omp task
-    { MPI_Bcast(buffer_int, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD); }
+    {
+      CHECK_OVERLAP_BEGIN
+      MPI_Bcast(buffer_int, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD);
+      CHECK_OVERLAP_END
+    }
 #pragma omp task
-    { MPI_Bcast(buffer_float, BUFFER_LENGTH_FLOAT, MPI_FLOAT, 0, MPI_COMM_WORLD); }
+    {
+      CHECK_OVERLAP_BEGIN
+      MPI_Bcast(buffer_float, BUFFER_LENGTH_FLOAT, MPI_FLOAT, 0, MPI_COMM_WORLD);
+      CHECK_OVERLAP_END
+    }
   }  // end parallel
 
   if (myRank == 1) {
@@ -54,6 +64,7 @@ int main(int argc, char *argv[]) {
   free(buffer_int);
   free(buffer_float);
 
+  has_error_manifested(overlap_count != 0);
   MPI_Finalize();
 
   return 0;

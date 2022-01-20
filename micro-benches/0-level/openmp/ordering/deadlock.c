@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
     free(buffer);
   }  // end parallel
 
+  has_error_manifested(false);
   MPI_Finalize();
 
   return 0;

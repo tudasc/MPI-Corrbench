@@ -25,20 +25,29 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   const int other_rank = size - myRank - 1;
 
-#pragma omp parallel num_threads(2)
+#pragma omp parallel num_threads(2) reduction(+ : overlap_count)
   {
 #pragma omp task
-    { MPI_Barrier(MPI_COMM_WORLD); }
+    {
+      CHECK_OVERLAP_BEGIN
+      MPI_Barrier(MPI_COMM_WORLD);
+      CHECK_OVERLAP_END
+    }
 #pragma omp task
     {
       int *buffer = malloc(BUFFER_LENGTH_BYTE);
+      CHECK_OVERLAP_BEGIN
       MPI_Bcast(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD);
+      CHECK_OVERLAP_END
       free(buffer);
     }
   }  // end parallel
 
+  has_error_manifested(overlap_count != 0);
   MPI_Finalize();
 
   return 0;

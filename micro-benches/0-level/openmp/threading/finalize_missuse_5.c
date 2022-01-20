@@ -22,6 +22,7 @@ int main(int argc, char *argv[]) {
 
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
+  DEF_ORDER_CAPTURING_VARIABLES
 #pragma omp parallel
   {
 #pragma omp for
@@ -36,23 +37,37 @@ int main(int argc, char *argv[]) {
         if (myRank == 0) {
           MPI_Send(buffer_out, 10, MPI_INT, 1, 123, MPI_COMM_WORLD);
         } else if (myRank == 1) {
+          ENTER_CALL_A
           MPI_Recv(buffer_in, 10, MPI_INT, 0, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          EXIT_CALL_A
         }
       }
 #pragma omp section
       if (myRank == 1) {
         MPI_Send(buffer_out, 10, MPI_INT, 0, 123, MPI_COMM_WORLD);
       } else if (myRank == 0) {
-        usleep(5);  // make wrong thread ordering more liekly
+#ifdef USE_DISTURBED_THREAD_ORDER
+        us_sleep(20);
+#endif
+        ENTER_CALL_A
         MPI_Recv(buffer_in, 10, MPI_INT, 1, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        EXIT_CALL_A
       }
     }
 // NO implicit OpenMP Barrier
 // this MAY led one threead to call finalize before all communication has finished
 #pragma omp master
-    { MPI_Finalize(); }
+    {
+#ifndef USE_DISTURBED_THREAD_ORDER
+      us_sleep(20);
+#endif
+      ENTER_CALL_B
+      MPI_Finalize();
+      EXIT_CALL_B
+    }
   }
   // end of omp parallel
 
+  has_error_manifested(!CHECK_FOR_EXPECTED_ORDER);
   return 0;
 }

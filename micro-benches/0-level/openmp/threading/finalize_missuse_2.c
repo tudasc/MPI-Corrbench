@@ -52,5 +52,6 @@ int main(int argc, char *argv[]) {
   }
   // end of omp parallel
 
+  has_error_manifested(NUM_THREADS > 1);
   return 0;
 }

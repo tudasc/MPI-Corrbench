@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  DEF_ORDER_CAPTURING_VARIABLES
+
   int recv_data[BUFFER_LENGTH_INT];
   int send_data[BUFFER_LENGTH_INT];
   MPI_Request req;
@@ -32,9 +34,10 @@ int main(int argc, char *argv[]) {
   fill_message_buffer(recv_data, BUFFER_LENGTH_BYTE, 6);
   fill_message_buffer(send_data, BUFFER_LENGTH_BYTE, 1);
 
-#pragma omp parallel num_threads(NUM_THREADS)
+#pragma omp parallel num_threads(NUM_THREADS) reduction(+ : overlap_count)
   {
     const int index = omp_get_thread_num();
+    CHECK_OVERLAP_BEGIN
     MPI_Irecv(&recv_data[index], 1, MPI_INT, size - rank - 1, index, MPI_COMM_WORLD, &req);
 
     send_data[index] = -1;
@@ -44,11 +47,11 @@ int main(int argc, char *argv[]) {
 
     MPI_Wait(&req_send, MPI_STATUS_IGNORE);
     MPI_Wait(&req, MPI_STATUS_IGNORE);
+    CHECK_OVERLAP_END
   }
 
+  has_error_manifested(overlap_count != 0);
   MPI_Finalize();
-
-  has_error_manifested(false);
 
   return 0;
 }
