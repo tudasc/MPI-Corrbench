@@ -31,12 +31,12 @@ int main(int argc, char *argv[]) {
     {
 #pragma omp master
       {
-        MPI_Send(&private_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); /* B */
-        private_data = rank;  // initialization of private variable only happend after send
+        private_data = rank;  // initialization of private variable happend before send
+        MPI_Send(&private_data, 1, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); /* B */
       }
     }
   } else if (rank == 1) {
-    MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(recv_data, 1, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
     has_error_manifested(recv_data[0] != 0);
   }

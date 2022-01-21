@@ -33,13 +33,13 @@ int main(int argc, char *argv[]) {
     {
 #pragma omp master
       {
-        MPI_Isend(&private_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &send_req); /* B */
+        MPI_Isend(&private_data, 1, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, &send_req); /* B */
         MPI_Wait(&send_req, MPI_STATUS_IGNORE);
       }
     }
 
   } else if (rank == 1) {
-    MPI_Recv(recv_data, BUFFER_LENGTH_INT, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(recv_data, 1, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
     has_error_manifested(recv_data[0] != 0);
   }
