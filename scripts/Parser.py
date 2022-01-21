@@ -31,6 +31,7 @@ error_present = 7
 error_present_without_tool = 8
 case_id = 9
 full_case_name = 10
+cflags_used = 11
 
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
 NUM_MPI_RANKS = 2
@@ -95,6 +96,9 @@ def main():
         with open(test_dir.path + "/case_name", 'r') as f:
             full_case = f.read().rstrip()
             case = os.path.basename(full_case)
+       # read the cflags used
+        with open(test_dir.path + "/cflags_used", 'r') as f:
+            cf_used = f.read().rstrip()
 
         code_has_error = True
         if "correct/" in full_case:
@@ -103,7 +107,7 @@ def main():
         local_error_manifested_without_tool = check_if_error_manifested(test_dir.path+"/without_tool")
 
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
-        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case]
+        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case,cf_used]
 
         ## -1 = error processing case
         if error_found == -1:
@@ -127,6 +131,10 @@ def main():
                         data[FW] = 1
                     else:
                         data[TN] = 1
+
+        #if local_error_manifested == 0:
+        #    print("not_manifested:")
+        #    print(full_case)
 
         basic_data[case_id] = data
 
