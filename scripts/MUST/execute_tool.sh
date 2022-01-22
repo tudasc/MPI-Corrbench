@@ -1,7 +1,7 @@
 
 module use /home/tj75qeje/moudles/modulefiles
 module purge
-module load cmake gcc python openmpi llvm/10 librhash libxml2 MUST/1.8
+module load cmake gcc python openmpi/4.0.3 llvm/10 librhash libxml2 MUST/1.8
 #module load cmake gcc python openmpi llvm/10 librhash libxml2 MUST/1.7.1
 #module load cmake gcc llvm/10 intelmpi/test python llvm/10 librhash libxml2 MUST/1.8_intel
 #module load cmake gcc llvm/10 python librhash libxml2 MUST/1.8_intel
@@ -20,6 +20,11 @@ export OMPI_CXX=clang++
 #export FC="mpifc"
 #export MPIFC="mpifc"
 
+#export MPICH_CC=clang
+#export MPICC=mpigcc
+#export MPICH_CXX=clang++
+#export MPICXX=mpigxx
+
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
 # in $(pwd) is a file testcase.c , that should be analyzed
@@ -30,6 +35,7 @@ cd without_tool
 /usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC $CORRBENCH_CFLAGS -g -fopenmp ../testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run_baseline $TIMEOUT_CMD mpirun -n 2 ./a.out
+echo $? > exit_code_no_tool
 
 rm a.out
 cd ..
@@ -40,9 +46,8 @@ echo "$MPICC $CORRBENCH_CFLAGS -g -fopenmp -fsanitize=thread testcase.c -lm"
 
 /usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun --must:distributed --must:hybrid -n 2 ./a.out
 
-#/usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun --must:distributed --must:hybrid -n 2 ./a.out
-#suse tandard must mode for crash handeling
-/usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun --must:hybrid -n 2 ./a.out
+#use standard must mode for crash handeling?
+#/usr/bin/time --format "%e,%M" -o time_run $TIMEOUT_CMD mustrun --must:hybrid -n 2 ./a.out
 
 echo "$(tail -n 1 without_tool/time_compile_baseline),$( tail -n 1 time_compile)" >> compile_overhead.csv
 echo "$(tail -n 1 without_tool/time_run_baseline),$( tail -n 1 time_run)" >> run_overhead.csv

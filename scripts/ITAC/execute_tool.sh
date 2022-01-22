@@ -25,6 +25,7 @@ cd without_tool
 /usr/bin/time --format "%e,%M" -o time_compile_baseline $MPICC $CORRBENCH_CFLAGS -g -fopenmp ../testcase.c -lm
 
 /usr/bin/time --format "%e,%M" -o time_run_baseline $TIMEOUT_CMD mpirun -n 2 ./a.out 1> /dev/null 2>&1
+echo $? > exit_code_no_tool
 
 rm a.out
 cd ..
