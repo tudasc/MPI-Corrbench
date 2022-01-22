@@ -96,9 +96,20 @@ def main():
         with open(test_dir.path + "/case_name", 'r') as f:
             full_case = f.read().rstrip()
             case = os.path.basename(full_case)
-       # read the cflags used
-        with open(test_dir.path + "/cflags_used", 'r') as f:
-            cf_used = f.read().rstrip()
+        # read the cflags used
+        try:
+            with open(test_dir.path + "/cflags_used", 'r') as f:
+                cf_used = f.read().rstrip()
+        except (FileNotFoundError) as e:
+               print("File "+test_dir.path + "/cflags_used not found")
+               cf_used =""
+        # read the exitcode without tool
+        try:
+            with open(test_dir.path + "/without_tool/exit_code_no_tool", 'r') as f:
+                exit_code_without_tool = f.read().rstrip()
+        except (FileNotFoundError) as e:
+            print("File "+test_dir.path + "/without_tool/exit_code_no_tool not found")
+            exit_code_without_tool=0
 
         code_has_error = True
         if "correct/" in full_case:
@@ -107,7 +118,7 @@ def main():
         local_error_manifested_without_tool = check_if_error_manifested(test_dir.path+"/without_tool")
 
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
-        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case,cf_used]
+        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case,cf_used,exit_code_without_tool]
 
         ## -1 = error processing case
         if error_found == -1:
