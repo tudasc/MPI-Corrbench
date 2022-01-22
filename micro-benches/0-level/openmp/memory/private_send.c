@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel num_threads(NUM_THREADS) default(shared) private(private_data) /* A */
     {
 #pragma omp master
-      { MPI_Send(&private_data, 14, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); /* B */ }
+      { MPI_Send(&private_data, 1, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD); /* B */ }
     }
   } else if (rank == 1) {
     MPI_Recv(recv_data, 1, MPI_INT, size - rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
