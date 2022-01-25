@@ -94,6 +94,7 @@ echo 'if [ ! -f compile_overhead.csv ]; then echo "baseline_time,baseline_mem,ti
 echo 'if [ ! -f run_overhead.csv ]; then echo "baseline_time,baseline_mem,time,mem" >> run_overhead.csv ; fi' >> $SCRIPTS_DIR/$TOOL/$OUTFILE
 # for later evaluation, there is no need to keep the src-file around, for convenience, we keep the filename
 echo 'echo "$THIS_CASE" > case_name' >> $SCRIPTS_DIR/$TOOL/$OUTFILE
+echo 'echo "$CORRBENCH_CFLAGS" > cflags_used' >> $SCRIPTS_DIR/$TOOL/$OUTFILE
 
 echo " " >> $SCRIPTS_DIR/$TOOL/$OUTFILE
 cat $SCRIPTS_DIR/$TOOL/execute_tool.sh >> $SCRIPTS_DIR/$TOOL/$OUTFILE
