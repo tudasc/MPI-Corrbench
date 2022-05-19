@@ -1,16 +1,17 @@
 
-module use /home/tj75qeje/moudles/modulefiles
 module purge
-module load cmake gcc python openmpi/4.0.3 llvm/10 librhash libxml2 MUST/1.8
-#module load cmake gcc python openmpi llvm/10 librhash libxml2 MUST/1.7.1
-#module load cmake gcc llvm/10 intelmpi/test python llvm/10 librhash libxml2 MUST/1.8_intel
-#module load cmake gcc llvm/10 python librhash libxml2 MUST/1.8_intel
+module load llvm/intel MUST/1.8
 
 # Openmpi
-export OMPI_CC=clang
-export OMPI_CXX=clang++
+#export OMPI_CC=clang
+#export OMPI_CXX=clang++
 
-#source ~/modules/software/intelmpi/setvars.sh
+source ~/modules/software/intelmpi/setvars.sh
+
+export MPICC=mpicc
+export I_MPI_CC=clang
+export I_MPI_CXX=clang++
+
 
 #intelmpi /mpich
 #export MPICC="mpigcc -cc=clang"

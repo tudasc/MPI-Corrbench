@@ -47,5 +47,7 @@ def parse_output(input_dir, is_error_expected, error_specification):
                 error_found = 0
     except UnicodeDecodeError:
         print("Error: UnicodeDecodeError while reading file %s (ignoring case)" % (fname))
+    except FileNotFoundError:
+        print("Error:file %s not found (ignoring case)" % (fname))
 
     return error_found, correct_error_found

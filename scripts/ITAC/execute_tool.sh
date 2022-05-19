@@ -1,18 +1,14 @@
-
 module purge
 #module load intel intelmpi
 
-module load gcc llvm/10 intelmpi/test
+module load llvm
 
 source ~/modules/software/intelmpi/setvars.sh
 
 #use clang, so we will use the same compiler/ same openmp implementation for all tests
-export MPICC="mpigcc -cc=clang"
-export CC="mpigcc -cc=clang"
-export MPICXX="mpigxx -cxx=clang++"
-export CXX="mpigxx -cxx=clang++"
-export FC="mpifc"
-export MPIFC="mpifc"
+export MPICC=mpicc
+export I_MPI_CC=clang
+export I_MPI_CXX=clang++
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 
