@@ -1,10 +1,11 @@
 
+module use /home/tj75qeje/moudles/modulefiles
 module purge
 module load llvm/intel MUST/1.8
 
 # Openmpi
-#export OMPI_CC=clang
-#export OMPI_CXX=clang++
+export OMPI_CC=clang
+export OMPI_CXX=clang++
 
 source ~/modules/software/intelmpi/setvars.sh
 
@@ -20,11 +21,6 @@ export I_MPI_CXX=clang++
 #export CXX="mpigxx -cxx=clang++"
 #export FC="mpifc"
 #export MPIFC="mpifc"
-
-#export MPICH_CC=clang
-#export MPICC=mpigcc
-#export MPICH_CXX=clang++
-#export MPICXX=mpigxx
 
 TIMEOUT_CMD="/usr/bin/timeout -k 120 120"
 

@@ -21,7 +21,8 @@ OUT_DIR=$BENCH_BASE_DIR/output
 SCRIPTS_DIR=$BENCH_BASE_DIR/scripts
 SRC_DIR=$BENCH_BASE_DIR/micro-benches
 
-TOOLS="MUST ITAC MPI-Checker PARCOACH"
+#TOOLS="MUST ITAC MPI-Checker PARCOACH"
+TOOLS="MUST ITAC"
 
 # make output dir if it not exists
 mkdir -p $OUT_DIR
@@ -35,16 +36,18 @@ for TOOL in $TOOLS ; do
 	
 	for dir in $IN_DIR/$TOOL/* ; do
 	    if [ -d "$dir" ]; then
-		python3 $SCRIPTS_DIR/Parser.py $dir $TOOL &
+		python3 $SCRIPTS_DIR/Parser.py $dir $TOOL 
+		#python3 $SCRIPTS_DIR/Parser.py $dir $TOOL &
     	    fi
 	done
 	
 	# wait for all parser to be complete
-	wait < <(jobs -p)
+#	wait < <(jobs -p)
 
-	python3 $SCRIPTS_DIR/gather_results.py $TOOL &
-	python3 $SCRIPTS_DIR/gather_performance.py $TOOL &
-	wait < <(jobs -p)
+#	python3 $SCRIPTS_DIR/gather_results.py $TOOL &
+#	python3 $SCRIPTS_DIR/gather_results.py $TOOL
+	#python3 $SCRIPTS_DIR/gather_performance.py $TOOL &
+#	wait < <(jobs -p)
 done
 
 echo "gathered all data"
