@@ -38,7 +38,7 @@ MAX_INDEX=$(( NUMCASES - 1))
 echo "Number Of Testcases: $MAX_INDEX"
 
 # setup environment for executing the tools
-export CPATH=$CPATH:$SRC_DIR/0-level/correct/include
+export CPATH=$CPATH:$SRC_DIR/0-level/correct/include:$SRC_DIR/0-level/openmp
 cd $OUT_DIR/$TOOL
 
 i=0

@@ -13,3 +13,6 @@ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR ..
 make install
 
 cd ../..
+
+# for version 1.8.preview
+#cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/tj75qeje/modules/software/MUST/1.8 -ENABLE_TSAN ..

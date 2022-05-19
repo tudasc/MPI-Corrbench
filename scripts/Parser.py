@@ -14,9 +14,12 @@ import json
 # correct_error_found wether or not exactely the expected error was found
 # -1 means could not tell (e.g. output is missing or not helpful or error specification missing) 0 means false, 1 true
 
+## entry: name: [TP,TN,FP,FN,ERR,error_present,error_present_without_tool,case_id,full_case_name]
+# True Positive, True Negative, False Positive, False negative,
+# ERR=error in parsing the output or runnung case,
+# error_present: if the error actually manifested during execution,
+# case_id, full_case_name for later more in depth analysis refers to the dir_name
 
-# entry: name: [TP,TN,FP,FN,TW,TN,ERR,case_id]
-# True Positive, True Negative, False Positive, False negative, True Warning,False Warning,ERR=error in parsing the output or runnung case, case_id for later analysis refers to the dir_name
 TP = 0
 TN = 1
 FP = 2
@@ -24,9 +27,14 @@ FN = 3
 TW = 4
 FW = 5
 ERR = 6
-case_id = 7
+error_present = 7
+error_present_without_tool = 8
+case_id = 9
+full_case_name = 10
+cflags_used = 11
 
 BENCH_BASE_DIR = os.environ["MPI_CORRECTNESS_BM_DIR"];
+NUM_MPI_RANKS = 2
 
 
 def parse_command_line_args():
@@ -40,7 +48,6 @@ def parse_command_line_args():
     parser.add_argument('TOOL', choices=['MUST', 'ITAC', 'MPI-Checker', 'PARCOACH'])
     parser.add_argument('--outfile', default="results.json")
 
-
     args = parser.parse_args()
     return args
 
@@ -52,6 +59,19 @@ def module_from_path(filepath):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def check_if_error_manifested(test_dir):
+    local_error_not_manifested= 0
+
+    for i in range(NUM_MPI_RANKS):
+        if os.path.exists(test_dir + "/error_not_present%d"%(i)):
+            local_error_not_manifested +=1
+
+    if local_error_not_manifested == NUM_MPI_RANKS:
+        return 0# no process had an error
+    else:
+        return 1# at least one process had the error
 
 
 def main():
@@ -71,34 +91,50 @@ def main():
         if not test_dir.is_dir():
             continue
 
-        case_id=test_dir.name
+        case_id = test_dir.name
         # read the case name from directory
         with open(test_dir.path + "/case_name", 'r') as f:
             full_case = f.read().rstrip()
             case = os.path.basename(full_case)
+        # read the cflags used
+        try:
+            with open(test_dir.path + "/cflags_used", 'r') as f:
+                cf_used = f.read().rstrip()
+        except (FileNotFoundError) as e:
+               print("File "+test_dir.path + "/cflags_used not found")
+               cf_used =""
+        # read the exitcode without tool
+        try:
+            with open(test_dir.path + "/without_tool/exit_code_no_tool", 'r') as f:
+                exit_code_without_tool = f.read().rstrip()
+        except (FileNotFoundError) as e:
+            print("File "+test_dir.path + "/without_tool/exit_code_no_tool not found")
+            exit_code_without_tool=0
 
         code_has_error = True
         if "correct/" in full_case:
             code_has_error = False
+        local_error_manifested = check_if_error_manifested(test_dir.path)
+        local_error_manifested_without_tool = check_if_error_manifested(test_dir.path+"/without_tool")
 
         error_found, correct_error_found = parser.parse_output(test_dir.path, code_has_error, "")
-        data = [0, 0, 0, 0,0,0, 0, case_id,full_case]
+        data = [0, 0, 0, 0, 0, 0, 0, local_error_manifested,local_error_manifested_without_tool, case_id, full_case,cf_used,exit_code_without_tool]
 
         ## -1 = error processing case
         if error_found == -1:
             data[ERR] = 1
         else:
             if code_has_error:
-                if error_found >0:
+                if error_found > 0:
                     # TP
                     data[TP] = 1
                 else:
-                    if error_found ==-2:
-                        data[TW]=1
+                    if error_found == -2:
+                        data[TW] = 1
                     else:
                         data[FN] = 1
             else:
-                if error_found>0:
+                if error_found > 0:
                     # FP
                     data[FP] = 1
                 else:
@@ -106,6 +142,10 @@ def main():
                         data[FW] = 1
                     else:
                         data[TN] = 1
+
+        #if local_error_manifested == 0:
+        #    print("not_manifested:")
+        #    print(full_case)
 
         basic_data[case_id] = data
 
