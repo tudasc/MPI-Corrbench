@@ -17,6 +17,10 @@ fi
 SCRIPTS_DIR=$BENCH_BASE_DIR/scripts
 SRC_DIR=$BENCH_BASE_DIR/micro-benches
 
+# setup for the Hybrid testcases
+export OMP_NUM_THREADS=2
+export CORRBENCH_CFLAGS="-DNUM_THREADS=2 -DBUFFER_LENGTH_INT=10"
+
 
 if [ -z "$TOOL" ]  ||  [ !  -d "$SCRIPTS_DIR/$TOOL" ]; then
 
