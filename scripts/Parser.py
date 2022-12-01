@@ -150,6 +150,7 @@ def main():
         basic_data[case_id] = data
 
     outfile = args.IN_DIR + "/" + args.outfile
+    print("write output to %s" % outfile)
     with open(outfile, 'w') as file:
         json.dump(basic_data, file)
 
