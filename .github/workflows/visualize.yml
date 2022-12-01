@@ -78,7 +78,7 @@ jobs:
         with:
           version: "9.0"
 # prerequisites
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9 llvm-9-dev
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev
 # install PARCOACH
       - name: Build PARCOACH
         run: |
