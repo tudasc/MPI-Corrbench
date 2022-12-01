@@ -79,7 +79,7 @@ jobs:
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
         with:
-          version: "9.0"
+          version: "15.0"
 # prerequisites
       - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev
 # install PARCOACH
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_PARCOACH
-          path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
+          path: ${{ github.workspace }}/experiment/PARCOACH/results_${{matrix.category}}_PARCOACH.json
 
   run-mpi-checker:
     runs-on: ubuntu-latest
@@ -118,7 +118,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_MPI-Checker
-          path: ${{ github.workspace }}/experiment/MPI-Checker/results_MPI-Checker.json
+          path: ${{ github.workspace }}/experiment/MPI-Checker/results_${{matrix.category}}_MPI-Checker.json
 
 
 #TODO re -enable PARCOACH
