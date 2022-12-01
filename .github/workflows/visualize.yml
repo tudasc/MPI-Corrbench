@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp/data_race,openmp/memory,openmp/ordering,openmp/threading]
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
@@ -65,12 +65,15 @@ jobs:
           path: ${{ github.workspace }}/experiment/ITAC/results_${{matrix.category}}_ITAC.json
 
 
-#for static tools: one CI job will be enough
   run-parcoach:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
       - name: Install LLVM and Clang
@@ -99,6 +102,10 @@ jobs:
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
 # install clang-tidy
