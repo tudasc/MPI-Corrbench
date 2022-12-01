@@ -73,6 +73,10 @@ jobs:
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
     steps:
       - uses: actions/checkout@v2
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "9.0"
 # prerequisites
       - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9 llvm-9-dev
 # install PARCOACH
@@ -90,9 +94,8 @@ jobs:
           name: results_PARCOACH
           path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
 
-#TODO PARCOACH needs older LLVM version
   run-mpi-checker:
-    runs-on: ubuntu-18
+    runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
