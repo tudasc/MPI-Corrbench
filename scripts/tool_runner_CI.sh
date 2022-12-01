@@ -1,6 +1,7 @@
 #!/bin/bash
 
 TOOL=$1
+CATEGORY=$2
 BENCH_BASE_DIR=$MPI_CORRECTNESS_BM_DIR
 OUT_DIR=$MPI_CORRECTNESS_BM_EXPERIMENT_DIR
 
@@ -28,12 +29,18 @@ echo "Error: No known Tool given"
 exit
 fi
 
+if [ -z "$CATEGORY" ]  ||  [ !  -d "$SRC_DIR/0-level/$CATEGORY" ]; then
+
+echo "Error: No known error category given"
+exit
+fi
+
 # make output dir if it not exists
 mkdir -p $OUT_DIR
 mkdir -p $OUT_DIR/$TOOL
 
 # only the src files, exclude dirs
-CASE_LIST=$(find "$SRC_DIR/0-level" -type f -name "*.c" )
+CASE_LIST=$(find "$SRC_DIR/0-level/$CATEGORY" -type f -name "*.c" )
 # convert list into array
 
 NUMCASES=$(wc -w <<< $CASE_LIST)

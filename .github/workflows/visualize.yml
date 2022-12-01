@@ -11,6 +11,10 @@ jobs:
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp/data_race,openmp/memory,openmp/ordering,openmp/threading]
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
@@ -28,17 +32,21 @@ jobs:
            export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib && \
            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib && \
            export CPATH=$CPATH:${GITHUB_WORKSPACE}/MUST_install/include && \
-           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST ${{matrix.category}}
       - uses: actions/upload-artifact@v2
         with:
           name: results_MUST
-          path: ${{ github.workspace }}/experiment/MUST/results_MUST.json
+          path: ${{ github.workspace }}/experiment/MUST/results_${{matrix.category}}_MUST.json
 
   run-itac:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp/data_race,openmp/memory,openmp/ordering,openmp/threading]
     steps:
       - uses: actions/checkout@v2
 # install ITAC     
@@ -50,13 +58,14 @@ jobs:
       - name: Run CorrBench
         run: |
            source ${GITHUB_WORKSPACE}/ITAC_install/setvars.sh && \
-           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh ITAC
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh ITAC ${{matrix.category}}
       - uses: actions/upload-artifact@v2
         with:
           name: results_ITAC
-          path: ${{ github.workspace }}/experiment/ITAC/results_ITAC.json
+          path: ${{ github.workspace }}/experiment/ITAC/results_${{matrix.category}}_ITAC.json
 
 
+#for static tools: one CI job will be enough
   run-parcoach:
     runs-on: ubuntu-latest
     env:
