@@ -29,7 +29,9 @@ echo "Error: No known Tool given"
 exit
 fi
 
-if [ -z "$CATEGORY" ]  ||  [ !  -d "$SRC_DIR/0-level/$CATEGORY" ]; then
+CATEGORY_DIR=${CATEGORY/-/\/}
+
+if [ -z "$CATEGORY" ]  ||  [ !  -d "$SRC_DIR/0-level/$CATEGORY_DIR" ]; then
 
 echo "Error: No known error category given"
 exit
@@ -40,7 +42,7 @@ mkdir -p $OUT_DIR
 mkdir -p $OUT_DIR/$TOOL
 
 # only the src files, exclude dirs
-CASE_LIST=$(find "$SRC_DIR/0-level/$CATEGORY" -type f -name "*.c" )
+CASE_LIST=$(find "$SRC_DIR/0-level/$CATEGORY_DIR" -type f -name "*.c" )
 # convert list into array
 
 NUMCASES=$(wc -w <<< $CASE_LIST)
@@ -72,6 +74,6 @@ echo "executed Tool on all Testcases"
 
 
 
-python3 $SCRIPTS_DIR/Parser.py . $TOOL --outfile results_${CATEGORY/\//-}$TOOL.json
+python3 $SCRIPTS_DIR/Parser.py . $TOOL --outfile results_$CATEGORY_$TOOL.json
 
 echo "Gathered all results"
