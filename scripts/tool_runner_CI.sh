@@ -70,6 +70,6 @@ done
 
 echo "executed Tool on all Testcases"
 
-python3 $SCRIPTS_DIR/Parser.py . $TOOL --outfile results_$TOOL.json
+python3 $SCRIPTS_DIR/Parser.py . $TOOL --outfile results_$CATEGORY_$TOOL.json
 
 echo "Gathered all results"
