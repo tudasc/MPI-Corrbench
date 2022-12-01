@@ -9,7 +9,7 @@ tar -xzf MUST-v1.8.0.tar.gz
 cd MUST-v1.8.0
 mkdir build && cd build
 
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -ENABLE_TSAN ..
 make install
 
 cd ../..
