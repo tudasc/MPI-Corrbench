@@ -114,7 +114,7 @@ jobs:
 #TODO re -enable PARCOACH
   generate-visualization:
 #    needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
-     needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
+    needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
@@ -131,11 +131,6 @@ jobs:
        with:
          path: ${{ github.workspace }}/output
      
-
-     - name: add missing data
-       run: python3 merge_data.py
-       working-directory: ${{ github.workspace }}/visualization
-  
      - name: add missing data
        run: python3 add_missing_data.py
        working-directory: ${{ github.workspace }}/visualization
