@@ -36,7 +36,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_MUST
-          path: ${{ github.workspace }}/experiment/MUST/results_${{matrix.category}}_MUST.json
+          path: ${{ github.workspace }}/experiment/MUST/results_${{{matrix.category}/\//-}}_MUST.json
 
   run-itac:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_ITAC
-          path: ${{ github.workspace }}/experiment/ITAC/results_${{matrix.category}}_ITAC.json
+          path: ${{ github.workspace }}/experiment/ITAC/results_${{{matrix.category}/\//-}}_ITAC.json
 
 
 #for static tools: one CI job will be enough
@@ -90,7 +90,7 @@ jobs:
           name: results_PARCOACH
           path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
 
-#TODO ubuntu 18 is deprecated: PARCOACH needs older LLVM version
+#TODO PARCOACH needs older LLVM version
   run-mpi-checker:
     runs-on: ubuntu-18
     env:
