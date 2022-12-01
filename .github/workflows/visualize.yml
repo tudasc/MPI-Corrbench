@@ -90,9 +90,9 @@ jobs:
           name: results_PARCOACH
           path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
 
-
+#TODO ubuntu 18 is deprecated: PARCOACH needs older LLVM version
   run-mpi-checker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
-      MUST_VERSION: "1.7.0"
+      MUST_VERSION: "1.8.0"
       ITAC_VERSION: "2021.2.0-215"
       MPI_CHECKER_VERSION: "10.0"
       PARCOACH_VERSION: "6990ff4 (master)"
