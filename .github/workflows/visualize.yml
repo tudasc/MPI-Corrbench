@@ -130,7 +130,7 @@ jobs:
       MUST_VERSION: "1.8.0"
       ITAC_VERSION: "2021.2.0-215"
       MPI_CHECKER_VERSION: "10.0"
-      PARCOACH_VERSION: "6990ff4 (master)"
+      PARCOACH_VERSION: "1.2"
     steps:
      - uses: actions/checkout@v2
      - run: mkdir output 
