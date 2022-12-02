@@ -11,4 +11,4 @@ export I_MPI_CXX=clang++
 
 $MPICC $CORRBENCH_CFLAGS -g -fopenmp testcase.c -fsanitize=thread -lm
 
-$TIMEOUT_CMD mustrun -n 2 --must:distributed --must:hybrid --oversubscribe ./a.out
+$TIMEOUT_CMD mustrun --oversubscribe -n 2 --must:distributed --must:hybrid ./a.out
