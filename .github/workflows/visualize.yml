@@ -64,7 +64,7 @@ jobs:
           name: results_ITAC
           path: ${{ github.workspace }}/experiment/ITAC/results_${{matrix.category}}_ITAC.json
 
-
+#TODO use new version of PARCOACH
   run-parcoach:
     runs-on: ubuntu-latest
     env:
@@ -79,7 +79,7 @@ jobs:
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
         with:
-          version: "15.0"
+          version: "9.0"
 # prerequisites
       - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev
 # install PARCOACH
@@ -121,9 +121,8 @@ jobs:
           path: ${{ github.workspace }}/experiment/MPI-Checker/results_${{matrix.category}}_MPI-Checker.json
 
 
-#TODO re -enable PARCOACH
+
   generate-visualization:
-#    needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
     needs: [run-mpi-checker, run-parcoach, run-must, run-itac]
     runs-on: ubuntu-latest
     env:
