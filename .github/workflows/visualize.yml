@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev libdw-dev libbfd-dev libdwarf-dev doxygen
       - run : sudo pip3 install numpy pandas lxml html5lib BeautifulSoup4
 # install MUST     
       - name: Build MUST
