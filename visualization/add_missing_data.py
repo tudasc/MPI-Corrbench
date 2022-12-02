@@ -1,20 +1,9 @@
+from analyze_helper import *
 import json
 import os
 import subprocess
 
 input_fname_pattern = "[BENCH_BASE_DIR]/output/results_[TOOL].json"
-
-# entry: name: [TP,TN,FP,FN,TW,TN,ERR,case_id,full_case_path]
-# True Positive, True Negative, False Positive, False negative, True Warning,False Warning,ERR=error in parsing the output or runnung case, case_id for later analysis refers to the dir_name
-TP = 0
-TN = 1
-FP = 2
-FN = 3
-TW = 4
-FW = 5
-ERR = 6
-case_id = 7
-full_case_name = 8
 
 Tools = ['MUST', 'ITAC', 'MPI-Checker', 'PARCOACH']
 
@@ -50,7 +39,9 @@ def add_missing_data(data, tools, bench_base_dir):
         # dict keys are strings (originally they are the execution directories name)
             if not str(i) in data[tool]:
                 # need to add missing data
-                data[tool][str(i)]=[0,0,0,0,0,0,1,str(i),testcases[i]]
+                data[tool][str(i)]=[0,0,0,0,0,0,1,1,1,str(i),testcases[i],"",1]
+            else:
+                assert(len(data[tool][str(i)])>=12)
     return data
 
 def main():
