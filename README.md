@@ -1,10 +1,11 @@
-# MPI-CorrBench 1.2.3 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![visualize](https://github.com/tudasc/MPI-Corrbench/actions/workflows/visualize.yml/badge.svg?branch=main)](https://github.com/tudasc/mpi-corrbench-dashboard)
+# MPI-CorrBench 2.0.0 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![visualize](https://github.com/tudasc/MPI-Corrbench/actions/workflows/visualize.yml/badge.svg?branch=main)](https://github.com/tudasc/mpi-corrbench-dashboard)
 
 MPI-CorrBench \[[CORRBE21](#ref-Corrbe21)\] enables a structured comparison of the different available tools for MPI correctness checking  w.r.t. various types of errors.
 
 ## [Visualization Dashboard](https://github.com/tudasc/mpi-corrbench-dashboard)
 MPI-CorrBench is automatically executed by our CI pipeline.
 You can find the automatically generated visualizations in our [Visualization Dashboard](https://github.com/tudasc/mpi-corrbench-dashboard).
+for the MPI+OpenMP testcases, the CI only executes one configuration for a better assesment it may be a good idea to execute it multiple times variing the amount of threads. For more detailes refer \[[HYBE22](#ref-Hybe22)\]
 
 ## Usage
 Provide the Following environment Variables:
@@ -26,4 +27,9 @@ The visualizations presented in \[[CORRBE21](#ref-Corrbe21)\] can be generated b
     <td valign="top"><a name="ref-Corrbe21"></a>[CORRBE21]</td>
     <td>Lehr, Jan-Patrick and Jammer, Tim and Bischof, Christian:
       MPI-CorrBench: Towards an MPI Correctness Benchmark Suite 2021. https://dl.acm.org/doi/abs/10.1145/3431379.3460652</td>
+</tr>
+<tr>
+    <td valign="top"><a name="ref-Hybe22"></a>[HYBE22]</td>
+    <td>Jammer, Tim and Hück, Alexander and Lehr, Jan-Patrick and Protze, Joachim and Schwitanski, Simon and Bischof, Christian:
+      Towards a Hybrid MPI Correctness Benchmark Suite 2022. https://dl.acm.org/doi/10.1145/3555819.3555853</td>
 </tr>
