@@ -24,7 +24,7 @@ cflags_used = 11
 exit_code_without_tool = 12
 
 #categories = ['pt2pt', 'coll', 'usertypes', 'rma']
-categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp/data_race','openmp/ordering','openmp/threading','openmp/memory']
+categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp-data_race','openmp-ordering','openmp-threading','openmp-memory']
 
 # compile #'time, 'baseline_time','mem','baseline_mem' run#'time, 'baseline_time','mem','baseline_mem'
 time_compile = 0
@@ -44,7 +44,7 @@ def get_category(this_case):
 
     category = None
     for canidate in categories:
-        if canidate + "/" in name:
+        if canidate.replace("-","/") + "/" in name:
             # only one category
             assert category == None
             category = canidate
@@ -57,7 +57,6 @@ def get_category(this_case):
 
 def load_case_names(base_dir):
     omp_dir=base_dir+"/micro-benches/0-level/openmp/"
-    omp_dir ="/home/ss540294/research/MPI-Corrbench/micro-benches/0-level/openmp/"
     filename = base_dir+"/micro-benches/0-level/openmp/case_numbering.txt"
     with open(filename) as file:
         lines = file.readlines()
@@ -223,7 +222,7 @@ def score_by_category(tools, data):
         for case in data[tool].values():
             name = case[full_case_name]
             complexity = 'base'
-            if 'conflo/' in name:
+            if 'conflo' in name:
                 complexity = 'conflo'
 
             category = get_category(case)
