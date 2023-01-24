@@ -4,10 +4,10 @@
  *  (C) 2003 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
  */
+#include "mpitest.h"
+#include <assert.h>
 #include <mpi.h>
 #include <stdio.h>
-#include <assert.h>
-#include "mpitest.h"
 
 #define NSTEPS 100
 #define N 1000
@@ -26,70 +26,67 @@
  * function. */
 double junk = 0.0;
 
-void compute(int step, double *data)
-{
-    int i;
+void compute(int step, double *data) {
+  int i;
 
-    for (i = 0; i < N; i++)
-        junk += data[i] * (double) step;
+  for (i = 0; i < N; i++)
+    junk += data[i] * (double)step;
 }
 
-int main(int argc, char *argv[])
-{
-    int i, rank, nproc;
-    int errors = 0, all_errors = 0;
-    MPI_Win win;
-    MPI_Request put_req[M] = { MPI_REQUEST_NULL };
-    MPI_Request get_req;
-    double *baseptr;
-    double data[M][N];          /* M buffers of length N */
-    MPI_Info win_info;
+int main(int argc, char *argv[]) {
+  int i, rank, nproc;
+  int errors = 0, all_errors = 0;
+  MPI_Win win;
+  MPI_Request put_req[M] = {MPI_REQUEST_NULL};
+  MPI_Request get_req;
+  double *baseptr;
+  double data[M][N]; /* M buffers of length N */
+  MPI_Info win_info;
 
-    MTest_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &nproc);
+  MTest_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
-    assert(M < NSTEPS);
+  assert(M < NSTEPS);
 
-    MPI_Info_create(&win_info);
+  MPI_Info_create(&win_info);
 
 #ifdef USE_WIN_ALLOC_SHM
-    MPI_Info_set(win_info, "alloc_shm", "true");
+  MPI_Info_set(win_info, "alloc_shm", "true");
 #else
-    MPI_Info_set(win_info, "alloc_shm", "false");
+  MPI_Info_set(win_info, "alloc_shm", "false");
 #endif
 
-    MPI_Win_allocate(NSTEPS * N * sizeof(double), sizeof(double), win_info,
-                     MPI_COMM_WORLD, &baseptr, &win);
+  MPI_Win_allocate(NSTEPS * N * sizeof(double), sizeof(double), win_info, MPI_COMM_WORLD, &baseptr, &win);
 
-    MPI_Win_lock_all(0, win);
+  MPI_Win_lock_all(0, win);
 
-    for (i = 0; i < NSTEPS; i++) {
-        int target = (rank + 1) % nproc;
-        int j;
+  for (i = 0; i < NSTEPS; i++) {
+    int target = (rank + 1) % nproc;
+    int j;
 
-        /* Find a free put request */
-        if (i < M) {
-            j = i;
-        } else {
-            MPI_Waitany(M, put_req, &j, MPI_STATUS_IGNORE);
-        }
-
-        MPI_Rget(data[j], N, MPI_DOUBLE, target, i * N, N, MPI_DOUBLE, win, &get_req);
-        MPI_Wait(&get_req, MPI_STATUS_IGNORE);
-
-        compute(i, data[j]);
-        MPI_Rput(data[j], N, MPI_DOUBLE, target, i * N, N, MPI_DOUBLE, win, &put_req[j]);
+    /* Find a free put request */
+    if (i < M) {
+      j = i;
+    } else {
+      MPI_Waitany(M, put_req, &j, MPI_STATUS_IGNORE);
     }
 
-    MPI_Waitall(M, put_req, MPI_STATUSES_IGNORE);
-    MPI_Win_unlock_all(win);
+    MPI_Rget(data[j], N, MPI_DOUBLE, target, i * N, N, MPI_DOUBLE, win, &get_req);
+    MPI_Wait(&get_req, MPI_STATUS_IGNORE);
 
-    MPI_Win_free(&win);
+    compute(i, data[j]);
+    MPI_Rput(data[j], N, MPI_DOUBLE, target, i * N, N, MPI_DOUBLE, win, &put_req[j]);
+  }
 
-    MPI_Info_free(&win_info);
+  MPI_Waitall(M, put_req, MPI_STATUSES_IGNORE);
+  MPI_Win_unlock_all(win);
 
-    MTest_Finalize(errors);
+  MPI_Win_free(&win);
 
-    return MTestReturnValue(all_errors);
+  MPI_Info_free(&win_info);
+
+  MTest_Finalize(errors);
+
+  return MTestReturnValue(all_errors);
 }

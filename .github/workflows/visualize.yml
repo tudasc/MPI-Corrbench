@@ -2,7 +2,7 @@ name: visualize
 on:
  push:
   branches:
-    - main
+    - feat/MPI+X
  workflow_dispatch:
 
 jobs:
@@ -11,10 +11,14 @@ jobs:
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
 # prerequisites for must
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libxml2-dev openmpi-bin libopenmpi-dev libdw-dev libbfd-dev libdwarf-dev doxygen
       - run : sudo pip3 install numpy pandas lxml html5lib BeautifulSoup4
 # install MUST     
       - name: Build MUST
@@ -28,17 +32,21 @@ jobs:
            export LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib && \
            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/MUST_install/lib && \
            export CPATH=$CPATH:${GITHUB_WORKSPACE}/MUST_install/include && \
-           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh MUST ${{matrix.category}}
       - uses: actions/upload-artifact@v2
         with:
           name: results_MUST
-          path: ${{ github.workspace }}/experiment/MUST/results_MUST.json
+          path: ${{ github.workspace }}/experiment/MUST/results_${{matrix.category}}_MUST.json
 
   run-itac:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
 # install ITAC     
@@ -50,22 +58,30 @@ jobs:
       - name: Run CorrBench
         run: |
            source ${GITHUB_WORKSPACE}/ITAC_install/setvars.sh && \
-           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh ITAC
+           bash ${GITHUB_WORKSPACE}/scripts/tool_runner_CI.sh ITAC ${{matrix.category}}
       - uses: actions/upload-artifact@v2
         with:
           name: results_ITAC
-          path: ${{ github.workspace }}/experiment/ITAC/results_ITAC.json
+          path: ${{ github.workspace }}/experiment/ITAC/results_${{matrix.category}}_ITAC.json
 
-
+#TODO use new version of PARCOACH
   run-parcoach:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "9.0"
 # prerequisites
-      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev clang-9 llvm-9 llvm-9-dev
+      - run : sudo apt-get update && sudo apt-get install -y cmake git libopenmpi-dev
 # install PARCOACH
       - name: Build PARCOACH
         run: |
@@ -79,14 +95,17 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_PARCOACH
-          path: ${{ github.workspace }}/experiment/PARCOACH/results_PARCOACH.json
-
+          path: ${{ github.workspace }}/experiment/PARCOACH/results_${{matrix.category}}_PARCOACH.json
 
   run-mpi-checker:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
       MPI_CORRECTNESS_BM_EXPERIMENT_DIR: ${{ github.workspace }}/experiment
+    strategy:
+      fail-fast: true
+      matrix:
+        category: [coll,conflo,correct,pt2pt,rma,usertypes,openmp-data_race,openmp-memory,openmp-ordering,openmp-threading]
     steps:
       - uses: actions/checkout@v2
 # install clang-tidy
@@ -99,7 +118,8 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: results_MPI-Checker
-          path: ${{ github.workspace }}/experiment/MPI-Checker/results_MPI-Checker.json
+          path: ${{ github.workspace }}/experiment/MPI-Checker/results_${{matrix.category}}_MPI-Checker.json
+
 
 
   generate-visualization:
@@ -107,35 +127,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MPI_CORRECTNESS_BM_DIR: ${{ github.workspace }}
-      MUST_VERSION: "1.7.0"
+      MUST_VERSION: "1.8.0"
       ITAC_VERSION: "2021.2.0-215"
       MPI_CHECKER_VERSION: "10.0"
-      PARCOACH_VERSION: "6990ff4 (master)"
+      PARCOACH_VERSION: "1.2"
     steps:
      - uses: actions/checkout@v2
      - run: mkdir output 
      - run : sudo pip3 install numpy pandas matplotlib
 
-     - uses: actions/download-artifact@v2
+     - uses: actions/download-artifact@v3
        with:
-         name: results_MUST
          path: ${{ github.workspace }}/output
-
-     - uses: actions/download-artifact@v2
-       with:
-         name: results_ITAC
-         path: ${{ github.workspace }}/output
-         
-     - uses: actions/download-artifact@v2
-       with:
-         name: results_PARCOACH
-         path: ${{ github.workspace }}/output
-
-     - uses: actions/download-artifact@v2
-       with:
-         name: results_MPI-Checker
-         path: ${{ github.workspace }}/output   
-  
+     
      - name: add missing data
        run: python3 add_missing_data.py
        working-directory: ${{ github.workspace }}/visualization
@@ -157,6 +161,7 @@ jobs:
        working-directory: ${{ github.workspace }}/visualization
        run: |
          # Git setup
+         exit
          export GITHUB_USER=corrbench-bot
          echo "GITHUB_USER=$GITHUB_USER" >> $GITHUB_ENV
          echo "GITHUB_TOKEN=${{ secrets.dashboard_update_token }}" >> $GITHUB_ENV
@@ -176,5 +181,5 @@ jobs:
          cat skeleton.md stats.md > README.md
          git add README.md images/*
          git commit -m"Updated (${{ github.event.commits[0].message }})" 
-         git push
+         #git push
 

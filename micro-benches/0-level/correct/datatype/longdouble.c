@@ -4,10 +4,10 @@
  *      See COPYRIGHT in top-level directory.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "mpi.h"
 #include "mpitest.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Some MPI implementations should not support MPI_LONG_DOUBLE because it has
  * different representations/sizes among several concurrently supported
@@ -20,44 +20,41 @@
  *
  * Based on a test suggested by Jim Hoekstra @ Iowa State University. */
 
-int main(int argc, char *argv[])
-{
-    int rank, size, i, type_size;
-    int errs = 0;
+int main(int argc, char *argv[]) {
+  int rank, size, i, type_size;
+  int errs = 0;
 
-    MPI_Init(&argc, &argv);
+  MPI_Init(&argc, &argv);
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    if (rank == 0) {
+  if (rank == 0) {
 #ifdef HAVE_LONG_DOUBLE
-        if (MPI_LONG_DOUBLE != MPI_DATATYPE_NULL) {
-            MPI_Type_size(MPI_LONG_DOUBLE, &type_size);
-            if (type_size != sizeof(long double)) {
-                printf("type_size != sizeof(long double) : (%d != %zd)\n",
-                       type_size, sizeof(long double));
-                ++errs;
-            }
-        }
+    if (MPI_LONG_DOUBLE != MPI_DATATYPE_NULL) {
+      MPI_Type_size(MPI_LONG_DOUBLE, &type_size);
+      if (type_size != sizeof(long double)) {
+        printf("type_size != sizeof(long double) : (%d != %zd)\n", type_size, sizeof(long double));
+        ++errs;
+      }
+    }
 #endif
 #if defined(HAVE_LONG_DOUBLE__COMPLEX) && defined(USE_LONG_DOUBLE_COMPLEX)
-        if (MPI_C_LONG_DOUBLE_COMPLEX != MPI_DATATYPE_NULL) {
-            MPI_Type_size(MPI_C_LONG_DOUBLE_COMPLEX, &type_size);
-            if (type_size != sizeof(long double _Complex)) {
-                printf("type_size != sizeof(long double _Complex) : (%d != %zd)\n",
-                       type_size, sizeof(long double _Complex));
-                ++errs;
-            }
-        }
-#endif
-        if (errs) {
-            printf("found %d errors\n", errs);
-        } else {
-            printf(" No errors\n");
-        }
+    if (MPI_C_LONG_DOUBLE_COMPLEX != MPI_DATATYPE_NULL) {
+      MPI_Type_size(MPI_C_LONG_DOUBLE_COMPLEX, &type_size);
+      if (type_size != sizeof(long double _Complex)) {
+        printf("type_size != sizeof(long double _Complex) : (%d != %zd)\n", type_size, sizeof(long double _Complex));
+        ++errs;
+      }
     }
+#endif
+    if (errs) {
+      printf("found %d errors\n", errs);
+    } else {
+      printf(" No errors\n");
+    }
+  }
 
-    MPI_Finalize();
-    return MTestReturnValue(errs);
+  MPI_Finalize();
+  return MTestReturnValue(errs);
 }

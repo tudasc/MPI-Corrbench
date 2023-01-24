@@ -125,6 +125,9 @@ def main():
 
     get_plot("basic_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn,ARGS.format)
 
+    # plot openmp overview
+    #TODO
+
     # plot by category
     for category in categories:
         # Data
@@ -153,7 +156,7 @@ def main():
 
         true_negative = [x + y for x, y in zip(true_negative, bad_warn)]
 
-        get_plot(category + "_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn,ARGS.format)
+        get_plot(category.replace("/", "_") + "_eval", fail, true_negative, true_positive, false_negative, false_positive, good_warn,ARGS.format)
 
 if __name__ == '__main__':
     main()

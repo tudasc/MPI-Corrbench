@@ -3,8 +3,12 @@ import json
 input_fname_pattern = "[BENCH_BASE_DIR]/output/results_[TOOL].json"
 input_fname_pattern_mini_app_performance = "[BENCH_BASE_DIR]/output/mini_app_performance_[TOOL].json"
 
-# entry: name: [TP,TN,FP,FN,TW,TN,ERR,case_id]
-# True Positive, True Negative, False Positive, False negative, True Warning,False Warning,ERR=error in parsing the output or runnung case, case_id for later analysis refers to the dir_name
+## entry: name: [TP,TN,FP,FN,ERR,error_present,error_present_without_tool,case_id,full_case_name]
+# True Positive, True Negative, False Positive, False negative,
+# ERR=error in parsing the output or runnung case,
+# error_present: if the error actually manifested during execution,
+# case_id, full_case_name for later more in depth analysis refers to the dir_name
+
 TP = 0
 TN = 1
 FP = 2
@@ -12,10 +16,15 @@ FN = 3
 TW = 4
 FW = 5
 ERR = 6
-case_id = 7
-full_case_name = 8
+error_present = 7
+error_present_without_tool = 8
+case_id = 9
+full_case_name = 10
+cflags_used = 11
+exit_code_without_tool = 12
 
-categories = ['pt2pt', 'coll', 'usertypes', 'rma']
+#categories = ['pt2pt', 'coll', 'usertypes', 'rma']
+categories = ['pt2pt', 'coll', 'usertypes', 'rma', 'openmp-data_race','openmp-ordering','openmp-threading','openmp-memory']
 
 # compile #'time, 'baseline_time','mem','baseline_mem' run#'time, 'baseline_time','mem','baseline_mem'
 time_compile = 0
@@ -35,7 +44,7 @@ def get_category(this_case):
 
     category = None
     for canidate in categories:
-        if canidate + "/" in name:
+        if canidate.replace("-","/") + "/" in name:
             # only one category
             assert category == None
             category = canidate
@@ -44,6 +53,26 @@ def get_category(this_case):
         assert category == None
         category = 'usertypes'
     return category
+
+
+def load_case_names(base_dir):
+    omp_dir=base_dir+"/micro-benches/0-level/openmp/"
+    filename = base_dir+"/micro-benches/0-level/openmp/case_numbering.txt"
+    with open(filename) as file:
+        lines = file.readlines()
+        lines = [line.rstrip() for line in lines]
+
+    case_names = {}
+
+    for l in lines:
+        name, number = l.split(" ")
+        case_names[omp_dir+name]=int(number)
+
+    return case_names
+
+def is_correct_case(this_case):
+    name = this_case[full_case_name]
+    return "correct" in name
 
 
 def add_score(score, case):
@@ -74,6 +103,8 @@ def load_data(tools, bench_base_dir):
         with open(fname, 'r') as file:
             data[tool] = json.load(file)
     return data
+
+
 
 
 def reduce_data(data, tools):
@@ -191,7 +222,7 @@ def score_by_category(tools, data):
         for case in data[tool].values():
             name = case[full_case_name]
             complexity = 'base'
-            if 'conflo/' in name:
+            if 'conflo' in name:
                 complexity = 'conflo'
 
             category = get_category(case)
@@ -200,3 +231,4 @@ def score_by_category(tools, data):
                 result[category][complexity][tool] = score
 
     return result
+
