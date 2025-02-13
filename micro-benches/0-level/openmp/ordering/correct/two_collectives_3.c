@@ -30,19 +30,17 @@ int main(int argc, char *argv[]) {
   if (myRank == 0) {
 #pragma omp parallel num_threads(NUM_THREADS)
     {
-#pragma omp single 
-    {
-#pragma omp task depend(inout: myRank)
+#pragma omp single
       {
-        MPI_Barrier(MPI_COMM_WORLD);
+#pragma omp task depend(inout : myRank)
+        { MPI_Barrier(MPI_COMM_WORLD); }
+#pragma omp task depend(inout : myRank)
+        {
+          int *buffer = malloc(BUFFER_LENGTH_BYTE);
+          MPI_Bcast(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD);
+          free(buffer);
+        }
       }
-#pragma omp task depend(inout: myRank)
-      {
-        int *buffer = malloc(BUFFER_LENGTH_BYTE);
-        MPI_Bcast(buffer, BUFFER_LENGTH_INT, MPI_INT, 0, MPI_COMM_WORLD);
-        free(buffer);
-      }
-    }
     }  // end parallel
   }
 
